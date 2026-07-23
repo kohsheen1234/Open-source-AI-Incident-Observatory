@@ -11,11 +11,12 @@ across forums and social platforms, and the original posts often disappear.
 AgentWatch exists to turn that scattered, disappearing evidence into a durable,
 searchable, and analysable record.
 
-!!! info "Project status: early foundation"
+!!! info "Project status: in active development"
     This documentation describes **only what is built and runnable today** — the data
-    foundation. Data collection, classification, the dashboard, and the API are
-    designed but not yet implemented. The docs grow as each part lands, so nothing
-    here is aspirational.
+    foundation and the ingestion pipeline (pluggable collectors, evidence storage,
+    normalisation, and scheduled collection). Classification, the dashboard, and the
+    API are designed but not yet implemented. The docs grow as each part lands, so
+    nothing here is aspirational.
 
 ## Why separate raw evidence from interpretation?
 
@@ -37,5 +38,6 @@ came from, and you always know whether a label came from a machine or a person.
 
 - **[Architecture](architecture.md)** — the components that exist today and how they
   fit together.
+- **[Collecting data](collection.md)** — the sources, the pipeline, and how to run it.
 - **[Data model](data-model.md)** — the full, table-by-table schema reference.
 - **[Development](development.md)** — how to install, test, and extend the project.

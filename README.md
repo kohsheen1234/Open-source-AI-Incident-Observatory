@@ -14,12 +14,13 @@ searchable, and analysable record** — so researchers and safety teams can meas
 how often these incidents happen, what kinds occur, and how the picture changes over
 time.
 
-> ### 🔭 Project status: early foundation
+> ### 🔭 Project status: in active development
 >
-> This repository is in active development. **What exists today is the data
-> foundation** — the configuration, logging, database schema, and migrations that
-> everything else is built on. Data collection, classification, the dashboard, and
-> the API are *designed but not yet implemented*. This README documents only what is
+> **What exists today: the data foundation and the ingestion pipeline.** AgentWatch
+> can collect public reports from pluggable sources, preserve each as tamper-evident
+> hashed evidence, and normalise them into de-duplicated incidents in the database —
+> driven by a CLI and an optional scheduler. **Classification, the dashboard, and the
+> API are designed but not yet implemented.** This README documents only what is
 > actually built and runnable right now, and grows as each part lands.
 >
 > Everything described below works today. Try it in five minutes with
@@ -39,6 +40,10 @@ complete and tested — provides:
 | **Database schema** | A five-table relational model (below) that captures raw evidence, normalised incidents, machine classifications, human reviews, and collection runs. |
 | **Migrations** | Versioned schema changes via Alembic; the same schema runs on PostgreSQL (production) and SQLite (fast tests). |
 | **Containerised database** | A one-command PostgreSQL service via Docker Compose. |
+| **Pluggable collectors** | A `DataSource` interface with three adapters: Hacker News (live), Replay (bundled fixtures, no credentials needed), and Reddit (opt-in). Adding a source is one new file. |
+| **Tamper-evident evidence** | Every collected item is stored verbatim on disk, named by its SHA-256 hash, so evidence survives deletion of the original. |
+| **Normalise + de-duplicate** | Collected items become de-duplicated incidents; re-collecting the same content adds nothing. Author identifiers are hashed. |
+| **Reliable collection** | A CLI and optional scheduler run collection with retries, per-source failure isolation, and a recorded run history. |
 | **Test suite** | Every component is covered by tests that run in under a second. |
 
 If you clone this repository, all of the above runs and passes. Nothing here is a
@@ -100,6 +105,36 @@ You now have a running database with the full AgentWatch schema, verified by tes
 To run against SQLite instead (no Docker needed), leave `AGENTWATCH_DATABASE_URL`
 unset — it defaults to a local SQLite file, which is exactly what the test suite uses.
 
+## Collecting incidents
+
+Once the schema exists, collect incidents with the `agentwatch` CLI. The **replay**
+source needs no credentials and works immediately, so you can see the full pipeline
+end to end:
+
+```bash
+# Collect from the bundled replay fixtures (no credentials required)
+agentwatch collect --source replay
+
+# Collect live from Hacker News, or from every configured source
+agentwatch collect --source hackernews
+agentwatch collect --source all --since-hours 168
+
+# Run collection continuously on a schedule
+agentwatch schedule --interval-minutes 60
+```
+
+Each run stores the original evidence under `AGENTWATCH_ARTIFACT_DIR`
+(as `<source>/<year>/<month>/<sha256>.json`), writes de-duplicated incidents to the
+database, and records a row in `collection_runs`. Re-running over the same window
+adds nothing new.
+
+**Sources:**
+
+- **replay** — bundled sample incidents; the credential-free default.
+- **hackernews** — live via the public Hacker News (Algolia) API; no key required.
+- **reddit** — opt-in; set `AGENTWATCH_REDDIT_CLIENT_ID` and
+  `AGENTWATCH_REDDIT_CLIENT_SECRET` and install the extra (`pip install -e ".[reddit]"`).
+
 ## Configuration
 
 All configuration is read from environment variables prefixed `AGENTWATCH_`
@@ -112,11 +147,13 @@ All configuration is read from environment variables prefixed `AGENTWATCH_`
 | `AGENTWATCH_AUTHOR_HASH_SALT` | `change-me-in-production` | Salt for hashing author identifiers |
 | `AGENTWATCH_LOG_LEVEL` | `INFO` | Log verbosity |
 | `AGENTWATCH_ENVIRONMENT` | `local` | Deployment environment label |
+| `AGENTWATCH_REDDIT_CLIENT_ID` | _(unset)_ | Enables the opt-in Reddit source |
+| `AGENTWATCH_REDDIT_CLIENT_SECRET` | _(unset)_ | Enables the opt-in Reddit source |
 
 ## Tech stack
 
-Python 3.12 · SQLAlchemy 2.0 · Alembic · Pydantic · structlog · PostgreSQL 16 ·
-Docker Compose · pytest · ruff.
+Python 3.12 · SQLAlchemy 2.0 · Alembic · Pydantic · httpx · tenacity · APScheduler ·
+structlog · PostgreSQL 16 · Docker Compose · pytest · ruff.
 
 ## Documentation
 
@@ -141,6 +178,13 @@ mkdocs serve
 agentwatch/        # the package
   config.py        # typed settings from the environment
   logging.py       # structured JSON logging
+  hashing.py       # content + author hashing
+  collectors/      # DataSource protocol + adapters (hackernews, replay, reddit)
+  storage/         # tamper-evident artifact file store
+  pipeline/        # ingest (persist/normalise/dedupe) + collection orchestration
+  sources.py       # source registry / defaults
+  cli.py           # `agentwatch` command-line interface
+  scheduler.py     # APScheduler-based recurring collection
   db/              # SQLAlchemy models, base, portable types, session management
 migrations/        # Alembic migration environment and versions
 deploy/            # docker-compose service definitions

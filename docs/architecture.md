@@ -1,7 +1,7 @@
 # Architecture
 
-This page describes the components that exist **today**. As new layers (collection,
-classification, dashboard, API) are built, they will be documented here.
+This page describes the components that exist **today**. As new layers
+(classification, dashboard, API) are built, they will be documented here.
 
 ## The foundation layer
 
@@ -70,6 +70,30 @@ PostgreSQL and SQLite.
 A PostgreSQL 16 service with a health check, mapped to host port **5433** (chosen to
 avoid clashing with a Postgres already running locally on 5432). `make db-up` starts
 it; `make migrate` creates the schema.
+
+## The ingestion layer
+
+On top of the foundation sits the pipeline that turns public posts into stored
+incidents. See [Collecting data](collection.md) for the full picture; in short:
+
+```text
+  DataSource adapters            (agentwatch/collectors)
+   replay | hackernews | reddit
+          │  fetch(since) -> RawArtifact[]
+          ▼
+  ingest: hash, de-duplicate,    (agentwatch/pipeline/ingest.py)
+          store evidence, write
+          raw_artifacts + incidents
+          ▼
+  orchestration: one CollectionRun  (agentwatch/pipeline/collect.py)
+          per source, failures isolated
+          ▲
+  CLI  (agentwatch/cli.py)   and   scheduler  (agentwatch/scheduler.py)
+```
+
+Each source implements one small interface (`name` + `fetch`), so adding a source is a
+single new file. Evidence is written to disk before anything else, keyed by SHA-256,
+and the database write is de-duplicated on the same hash.
 
 ## Portability: PostgreSQL and SQLite
 

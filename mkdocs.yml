@@ -27,5 +27,6 @@ markdown_extensions:
 nav:
   - Overview: index.md
   - Architecture: architecture.md
+  - Collecting data: collection.md
   - Data model: data-model.md
   - Development: development.md
