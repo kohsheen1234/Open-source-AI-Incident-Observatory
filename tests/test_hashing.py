@@ -2,8 +2,9 @@ from agentwatch.hashing import compute_content_hash, hash_author
 
 
 def test_content_hash_is_deterministic_and_order_independent():
-    a = compute_content_hash({"source": "hn", "source_id": "1", "url": "u", "title": "t", "body": "b"})
-    b = compute_content_hash({"body": "b", "title": "t", "url": "u", "source_id": "1", "source": "hn"})
+    fields = {"source": "hn", "source_id": "1", "url": "u", "title": "t", "body": "b"}
+    a = compute_content_hash(fields)
+    b = compute_content_hash(dict(reversed(list(fields.items()))))
     assert a == b
     assert len(a) == 64
 
