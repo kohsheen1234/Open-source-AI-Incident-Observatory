@@ -120,6 +120,16 @@ def create_app() -> FastAPI:
         with session_scope() as s:
             return Stats(**queries.stats(s))
 
+    @app.get("/metrics")
+    def metrics():
+        from fastapi import Response
+
+        from agentwatch.metrics import render_metrics
+
+        with session_scope() as s:
+            body, content_type = render_metrics(s)
+        return Response(content=body, media_type=content_type)
+
     @app.get("/exports/incidents.csv", dependencies=[Depends(require_api_key)])
     def export_csv():
         from fastapi.responses import PlainTextResponse
