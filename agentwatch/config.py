@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     environment: str = "local"
     reddit_client_id: str | None = None
     reddit_client_secret: str | None = None
+    ollama_host: str = "http://localhost:11434"
+    ollama_model: str = "qwen2.5:7b-instruct"
 
 
 @lru_cache
