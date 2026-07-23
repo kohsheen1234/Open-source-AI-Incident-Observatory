@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     author_hash_salt: str = "change-me-in-production"
     log_level: str = "INFO"
     environment: str = "local"
+    reddit_client_id: str | None = None
+    reddit_client_secret: str | None = None
 
 
 @lru_cache
