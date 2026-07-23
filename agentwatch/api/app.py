@@ -53,7 +53,13 @@ def _review_out(r) -> ReviewOut:
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="AgentWatch API", version="0.1.0")
+    from agentwatch.config import get_settings
+
+    app = FastAPI(
+        title="AgentWatch API",
+        version="0.1.0",
+        root_path=get_settings().api_root_path,
+    )
 
     @app.get("/health")
     def health() -> dict:

@@ -23,6 +23,8 @@ services:
       AGENTWATCH_DATABASE_URL: postgresql+psycopg://agentwatch:agentwatch@db:5432/agentwatch
       AGENTWATCH_ARTIFACT_DIR: /data/artifacts
       PORT: "8000"
+      # Served behind Caddy under /api, so the OpenAPI docs resolve the spec correctly.
+      AGENTWATCH_API_ROOT_PATH: /api
     volumes:
       - artifacts:/data/artifacts
     depends_on:

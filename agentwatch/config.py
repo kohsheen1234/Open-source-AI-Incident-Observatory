@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     ollama_host: str = "http://localhost:11434"
     ollama_model: str = "qwen2.5:7b-instruct"
     api_key: str | None = None
+    # Set when the API is served behind a reverse proxy under a sub-path (e.g. "/api"),
+    # so the OpenAPI docs load the spec from the correct URL. Empty when served at root.
+    api_root_path: str = ""
 
 
 @lru_cache
