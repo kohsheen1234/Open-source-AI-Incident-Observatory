@@ -32,6 +32,12 @@ def run_classify(provider_key: str, limit: int | None) -> int:
         return classify_pending(s, provider, limit=limit)
 
 
+def build_asgi_app():
+    from agentwatch.api.app import create_app
+
+    return create_app()
+
+
 def run_eval_cmd(provider_key: str) -> int:
     from agentwatch.eval.runner import run_eval
     from agentwatch.sources import build_provider
@@ -66,6 +72,10 @@ def main(argv: list[str] | None = None) -> int:
     ev = sub.add_parser("eval", help="Run the evaluation set and print metrics")
     ev.add_argument("--provider", default="baseline", help="baseline | ollama")
 
+    sv = sub.add_parser("serve", help="Run the HTTP API")
+    sv.add_argument("--host", default="127.0.0.1")
+    sv.add_argument("--port", type=int, default=8000)
+
     args = parser.parse_args(argv)
     since = datetime.now(UTC) - timedelta(hours=getattr(args, "since_hours", 168))
 
@@ -84,6 +94,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "eval":
         return run_eval_cmd(args.provider)
+    if args.command == "serve":
+        import uvicorn
+
+        uvicorn.run(build_asgi_app(), host=args.host, port=args.port)
+        return 0
     return 1
 
 
