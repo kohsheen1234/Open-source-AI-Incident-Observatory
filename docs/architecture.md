@@ -1,7 +1,7 @@
 # Architecture
 
-This page describes the components that exist **today**. As new layers (operational
-metrics dashboards and cloud deployment) are built, they will be documented here.
+This page describes the components that make up AgentWatch today, from configuration
+through to the deployed, observable stack.
 
 ## The foundation layer
 
@@ -141,6 +141,24 @@ dashboard consumes that API. See [API & dashboard](api.md).
 
 The dashboard never touches the database directly — it uses the same API that any
 external consumer would, so the API is the single access layer.
+
+## Observability & deployment
+
+The API exposes DB-derived Prometheus metrics at `/metrics`; Prometheus scrapes them
+and Grafana (provisioned as code) visualises them. The whole system is one
+`docker compose` stack behind a Caddy reverse proxy. See
+[Deployment & observability](deployment.md).
+
+```text
+  agentwatch CLI ─┐
+                  ├─▶ PostgreSQL ◀─ FastAPI (/metrics) ◀─ Prometheus ─▶ Grafana
+  scheduler ──────┘                      ▲
+                                         │  (all services on one compose network)
+                          Caddy ─▶ dashboard / api / grafana   (auto-HTTPS in prod)
+```
+
+Metrics are derived from the database, so they stay correct even though the collector
+CLI and the API server are separate processes.
 
 ## Portability: PostgreSQL and SQLite
 

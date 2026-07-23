@@ -14,21 +14,43 @@ searchable, and analysable record** — so researchers and safety teams can meas
 how often these incidents happen, what kinds occur, and how the picture changes over
 time.
 
-> ### 🔭 Project status: in active development
+> ### 🔭 Project status
 >
-> AgentWatch collects public reports from pluggable sources, preserves each as
-> tamper-evident hashed evidence, normalises them into de-duplicated incidents,
-> classifies each with a pluggable abstain-capable classifier (measured by a labelled
-> evaluation set and a prompt-regression gate), and exposes everything through a
-> documented, authenticated **HTTP API** and a **review dashboard**. Operational
-> metrics dashboards (Prometheus/Grafana) and cloud deployment are the remaining
-> planned pieces. This README documents only what is actually built and runnable
-> right now.
->
-> Everything described below works today. Try it in five minutes with
-> [Quickstart](#quickstart).
+> The end-to-end pipeline works today: AgentWatch collects public reports from
+> pluggable sources, preserves each as tamper-evident hashed evidence, normalises them
+> into de-duplicated incidents, classifies each with a pluggable abstain-capable
+> classifier (measured by a labelled evaluation set and a prompt-regression gate),
+> exposes everything through a documented, authenticated **HTTP API** and a **review
+> dashboard**, ships **Prometheus metrics + a provisioned Grafana dashboard**, and
+> comes up as a whole with a single `docker compose up` behind a Caddy reverse proxy
+> (auto-HTTPS in production). Everything described here is runnable now —
+> [one command](#run-the-whole-system) brings up the full stack.
 
 ---
+
+## Run the whole system
+
+With Docker installed:
+
+```bash
+make up      # builds and starts: db, api, dashboard, prometheus, grafana, caddy
+```
+
+Then open:
+
+- **http://localhost:8080** — the review dashboard
+- **http://localhost:8080/api/docs** — the API's OpenAPI docs
+- **http://localhost:8080/grafana** — the Grafana metrics dashboard
+
+Populate it with sample data (runs inside the stack):
+
+```bash
+docker compose -f deploy/docker-compose.yml exec api \
+  sh -c "agentwatch collect --source replay && agentwatch classify --provider baseline"
+```
+
+Stop it with `make down`. See [`docs/deployment.md`](docs/deployment.md) for the VPS +
+HTTPS guide. Prefer to run pieces directly on your machine? See [Quickstart](#quickstart).
 
 ## What's built today
 
@@ -51,6 +73,8 @@ complete and tested — provides:
 | **Measured quality** | A labelled evaluation set with precision / recall / macro-F1 / confusion matrix / abstention rate, and a regression test that fails if macro-F1 drops below a committed floor. |
 | **Documented HTTP API** | A FastAPI service (list / filter / detail / review / stats / CSV export) with auto-generated OpenAPI docs and optional API-key auth on writes. |
 | **Review dashboard** | A Streamlit app (overview, incident explorer, review queue) that consumes the API — reviewers accept, override, or flag classifications. |
+| **Metrics & dashboards** | The API exposes Prometheus metrics; Prometheus scrapes them and a provisioned Grafana dashboard visualises incidents, classifications, abstention rate, and collection-run health. |
+| **One-command stack** | `docker compose up` brings up db, API, dashboard, Prometheus, Grafana, and a Caddy reverse proxy (auto-HTTPS in production) on one network. |
 | **Test suite** | Every component is covered by tests that run in under a second. |
 
 If you clone this repository, all of the above runs and passes. Nothing here is a

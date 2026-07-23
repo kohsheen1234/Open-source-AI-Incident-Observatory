@@ -31,4 +31,5 @@ nav:
   - Classification & evaluation: classification.md
   - API & dashboard: api.md
   - Data model: data-model.md
+  - Deployment & observability: deployment.md
   - Development: development.md
