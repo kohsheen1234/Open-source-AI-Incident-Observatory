@@ -1,0 +1,34 @@
+{
+  "title": "AgentWatch",
+  "uid": "agentwatch",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": {"from": "now-6h", "to": "now"},
+  "panels": [
+    {
+      "type": "stat", "title": "Incidents", "id": 1,
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "targets": [{"expr": "agentwatch_incidents_total", "refId": "A"}]
+    },
+    {
+      "type": "stat", "title": "Classifications", "id": 2,
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "targets": [{"expr": "agentwatch_classifications_total", "refId": "A"}]
+    },
+    {
+      "type": "stat", "title": "Abstention rate", "id": 3,
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "targets": [{"expr": "agentwatch_abstention_rate", "refId": "A"}]
+    },
+    {
+      "type": "timeseries", "title": "Incidents by type", "id": 4,
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+      "targets": [{"expr": "agentwatch_incidents_by_type", "refId": "A"}]
+    },
+    {
+      "type": "timeseries", "title": "Collection runs by status", "id": 5,
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+      "targets": [{"expr": "agentwatch_collection_runs_total", "refId": "A"}]
+    }
+  ]
+}

@@ -16,5 +16,63 @@ services:
       timeout: 3s
       retries: 10
 
+  api:
+    build: ..
+    command: sh -c "alembic upgrade head && agentwatch serve --host 0.0.0.0 --port 8000"
+    environment:
+      AGENTWATCH_DATABASE_URL: postgresql+psycopg://agentwatch:agentwatch@db:5432/agentwatch
+      AGENTWATCH_ARTIFACT_DIR: /data/artifacts
+    volumes:
+      - artifacts:/data/artifacts
+    depends_on:
+      db:
+        condition: service_healthy
+
+  dashboard:
+    build: ..
+    command: streamlit run dashboard/app.py --server.port 8501 --server.address 0.0.0.0
+    environment:
+      AGENTWATCH_API_URL: http://api:8000
+    depends_on:
+      - api
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: agentwatch
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "8080:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - dashboard
+      - api
+      - grafana
+
+  # Optional local open-weight model server. Enable with:  docker compose --profile llm up
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["llm"]
+    volumes:
+      - ollama:/root/.ollama
+
 volumes:
   pgdata:
+  artifacts:
+  ollama:

@@ -1,0 +1,14 @@
+# Local: browse http://localhost:8080
+# Production: replace ":80" with your hostname (e.g. observatory.example.org) and
+# Caddy will obtain and renew HTTPS certificates automatically.
+:80 {
+	handle_path /api/* {
+		reverse_proxy api:8000
+	}
+	handle_path /grafana/* {
+		reverse_proxy grafana:3000
+	}
+	handle {
+		reverse_proxy dashboard:8501
+	}
+}
