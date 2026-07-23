@@ -32,7 +32,7 @@ build-backend = "setuptools.build_meta"
 include = ["agentwatch*"]
 
 [tool.setuptools.package-data]
-agentwatch = ["collectors/fixtures/*.json"]
+agentwatch = ["collectors/fixtures/*.json", "eval/*.json"]
 
 [tool.ruff]
 line-length = 100
