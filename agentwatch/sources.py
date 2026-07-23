@@ -24,3 +24,15 @@ def build_default_sources() -> list[DataSource]:
     # Reddit is opt-in; only included when credentials are configured.
     _ = reddit_enabled()
     return sources
+
+
+def build_provider(key: str):
+    from agentwatch.classify.providers.baseline import BaselineProvider
+
+    if key == "baseline":
+        return BaselineProvider()
+    if key == "ollama":
+        from agentwatch.classify.providers.ollama import OllamaProvider
+
+        return OllamaProvider()
+    raise ValueError(f"unknown provider: {key}")
