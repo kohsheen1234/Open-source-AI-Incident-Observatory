@@ -4,9 +4,12 @@ from sqlalchemy import engine_from_config, pool
 from agentwatch.config import get_settings
 from agentwatch.db import models  # noqa: F401 - register tables
 from agentwatch.db.base import Base
+from agentwatch.db.session import normalize_database_url
 
 config = context.config
-config.set_main_option("sqlalchemy.url", get_settings().database_url)
+# Normalise provider URLs (e.g. Render's postgresql://) to the psycopg3 driver,
+# matching the application engine.
+config.set_main_option("sqlalchemy.url", normalize_database_url(get_settings().database_url))
 target_metadata = Base.metadata
 
 

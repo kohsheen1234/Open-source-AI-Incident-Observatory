@@ -33,7 +33,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["agentwatch*"]
+include = ["agentwatch*", "dashboard*"]
 
 [tool.setuptools.package-data]
 agentwatch = ["collectors/fixtures/*.json", "eval/*.json"]

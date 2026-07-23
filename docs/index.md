@@ -11,6 +11,8 @@ across forums and social platforms, and the original posts often disappear.
 AgentWatch exists to turn that scattered, disappearing evidence into a durable,
 searchable, and analysable record.
 
+![AgentWatch demo](assets/demo.gif)
+
 !!! info "Project status"
     The end-to-end pipeline is built and runnable today: the data foundation, the
     ingestion pipeline (pluggable collectors, evidence storage, normalisation,

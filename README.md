@@ -8,6 +8,10 @@
 
 📖 **Live documentation:** <https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/>
 
+![AgentWatch demo](docs/assets/demo.gif)
+
+*The dashboard, API docs, and Grafana metrics — running the full stack against 84 real incidents (replay + live Hacker News).*
+
 As AI systems increasingly act on their own — running tools, taking actions, and
 operating with growing autonomy — people are posting about what happens when those
 systems behave in unexpected or unintended ways: an agent that deletes the wrong
@@ -44,6 +48,16 @@ time.
   The [`render.yaml`](render.yaml) blueprint provisions the API, the dashboard, and a
   managed Postgres. (A live interactive app needs a host account; the docs site above
   is always-on and needs nothing.)
+
+## Screenshots
+
+| Dashboard — Overview | Dashboard — Incident Explorer |
+|---|---|
+| ![Overview](docs/assets/screenshots/01-overview.png) | ![Incident Explorer](docs/assets/screenshots/02-explorer.png) |
+
+| Dashboard — Review Queue | API — OpenAPI docs | Grafana — metrics |
+|---|---|---|
+| ![Review Queue](docs/assets/screenshots/03-review.png) | ![API docs](docs/assets/screenshots/04-api-docs.png) | ![Grafana](docs/assets/screenshots/05-grafana.png) |
 
 ## Run the whole system
 
