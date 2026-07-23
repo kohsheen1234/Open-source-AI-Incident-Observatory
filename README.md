@@ -16,12 +16,14 @@ time.
 
 > ### 🔭 Project status: in active development
 >
-> **What exists today: the data foundation and the ingestion pipeline.** AgentWatch
-> can collect public reports from pluggable sources, preserve each as tamper-evident
-> hashed evidence, and normalise them into de-duplicated incidents in the database —
-> driven by a CLI and an optional scheduler. **Classification, the dashboard, and the
-> API are designed but not yet implemented.** This README documents only what is
-> actually built and runnable right now, and grows as each part lands.
+> **What exists today: the data foundation, the ingestion pipeline, and the
+> classification + evaluation layer.** AgentWatch can collect public reports from
+> pluggable sources, preserve each as tamper-evident hashed evidence, normalise them
+> into de-duplicated incidents, and classify each incident with a pluggable,
+> abstain-capable classifier whose quality is measured by a labelled evaluation set
+> and a prompt-regression gate. **The monitoring dashboard and the HTTP API are
+> designed but not yet implemented.** This README documents only what is actually
+> built and runnable right now, and grows as each part lands.
 >
 > Everything described below works today. Try it in five minutes with
 > [Quickstart](#quickstart).
@@ -44,6 +46,9 @@ complete and tested — provides:
 | **Tamper-evident evidence** | Every collected item is stored verbatim on disk, named by its SHA-256 hash, so evidence survives deletion of the original. |
 | **Normalise + de-duplicate** | Collected items become de-duplicated incidents; re-collecting the same content adds nothing. Author identifiers are hashed. |
 | **Reliable collection** | A CLI and optional scheduler run collection with retries, per-source failure isolation, and a recorded run history. |
+| **Pluggable classifier** | An `LLMProvider` interface with three backends: a deterministic Baseline (default, no dependencies), Ollama (local open-weight models), and optional Anthropic. Structured JSON output is validated; malformed output is retried, then abstained. |
+| **Abstain-capable taxonomy** | Ten incident types plus an explicit *insufficient_evidence* outcome, so the system distinguishes "no incident" from "not enough evidence". |
+| **Measured quality** | A labelled evaluation set with precision / recall / macro-F1 / confusion matrix / abstention rate, and a regression test that fails if macro-F1 drops below a committed floor. |
 | **Test suite** | Every component is covered by tests that run in under a second. |
 
 If you clone this repository, all of the above runs and passes. Nothing here is a
@@ -135,6 +140,39 @@ adds nothing new.
 - **reddit** — opt-in; set `AGENTWATCH_REDDIT_CLIENT_ID` and
   `AGENTWATCH_REDDIT_CLIENT_SECRET` and install the extra (`pip install -e ".[reddit]"`).
 
+## Classifying incidents
+
+Once incidents exist, classify the ones that have no classification yet:
+
+```bash
+# Deterministic baseline classifier (default; no model server or network needed)
+agentwatch classify --provider baseline
+
+# Classify with a local open-weight model served by Ollama
+agentwatch classify --provider ollama
+```
+
+Each classification records the incident type, severity, confidence, whether the
+model **abstained**, and the exact `model_name` and `prompt_version` used — so results
+are reproducible and auditable.
+
+## Measuring classifier quality
+
+Run the labelled evaluation set and print metrics:
+
+```bash
+agentwatch eval --provider baseline
+# → {"n": 24, "macro_f1": 1.0, "abstention_rate": 0.125, "total_cost_usd": 0.0, ...}
+```
+
+The same command works with `--provider ollama` to compare a real model against the
+baseline on identical data. A test (`tests/test_eval.py`) runs this evaluation and
+**fails if macro-F1 drops below a committed floor**, so a prompt or model change that
+regresses quality is caught automatically.
+
+See [`docs/classification.md`](docs/classification.md) for the taxonomy, the providers,
+and the evaluation methodology.
+
 ## Configuration
 
 All configuration is read from environment variables prefixed `AGENTWATCH_`
@@ -182,7 +220,9 @@ agentwatch/        # the package
   collectors/      # DataSource protocol + adapters (hackernews, replay, reddit)
   storage/         # tamper-evident artifact file store
   pipeline/        # ingest (persist/normalise/dedupe) + collection orchestration
-  sources.py       # source registry / defaults
+  classify/        # taxonomy, prompt, providers (baseline/ollama/anthropic), classifier
+  eval/            # labelled dataset, metrics, evaluation runner
+  sources.py       # source + provider registry / defaults
   cli.py           # `agentwatch` command-line interface
   scheduler.py     # APScheduler-based recurring collection
   db/              # SQLAlchemy models, base, portable types, session management

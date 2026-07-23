@@ -28,5 +28,6 @@ nav:
   - Overview: index.md
   - Architecture: architecture.md
   - Collecting data: collection.md
+  - Classification & evaluation: classification.md
   - Data model: data-model.md
   - Development: development.md

@@ -13,10 +13,11 @@ searchable, and analysable record.
 
 !!! info "Project status: in active development"
     This documentation describes **only what is built and runnable today** — the data
-    foundation and the ingestion pipeline (pluggable collectors, evidence storage,
-    normalisation, and scheduled collection). Classification, the dashboard, and the
-    API are designed but not yet implemented. The docs grow as each part lands, so
-    nothing here is aspirational.
+    foundation, the ingestion pipeline (pluggable collectors, evidence storage,
+    normalisation, scheduled collection), and the classification + evaluation layer
+    (pluggable abstain-capable classifier, labelled eval set, regression gate). The
+    monitoring dashboard and the HTTP API are designed but not yet implemented. The
+    docs grow as each part lands, so nothing here is aspirational.
 
 ## Why separate raw evidence from interpretation?
 
@@ -39,5 +40,6 @@ came from, and you always know whether a label came from a machine or a person.
 - **[Architecture](architecture.md)** — the components that exist today and how they
   fit together.
 - **[Collecting data](collection.md)** — the sources, the pipeline, and how to run it.
+- **[Classification & evaluation](classification.md)** — the taxonomy, providers, and how quality is measured.
 - **[Data model](data-model.md)** — the full, table-by-table schema reference.
 - **[Development](development.md)** — how to install, test, and extend the project.

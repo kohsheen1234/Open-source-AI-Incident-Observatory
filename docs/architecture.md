@@ -1,7 +1,7 @@
 # Architecture
 
 This page describes the components that exist **today**. As new layers
-(classification, dashboard, API) are built, they will be documented here.
+(the dashboard and the HTTP API) are built, they will be documented here.
 
 ## The foundation layer
 
@@ -94,6 +94,29 @@ incidents. See [Collecting data](collection.md) for the full picture; in short:
 Each source implements one small interface (`name` + `fetch`), so adding a source is a
 single new file. Evidence is written to disk before anything else, keyed by SHA-256,
 and the database write is de-duplicated on the same hash.
+
+## The classification layer
+
+Stored incidents are classified by a pluggable provider and scored by an evaluation
+harness. See [Classification & evaluation](classification.md); in short:
+
+```text
+  incident  →  build versioned prompt  →  LLMProvider.generate()
+                                              baseline | ollama | anthropic
+                                                    │  JSON
+                                                    ▼
+                                    validate → retry once → abstain on failure
+                                                    │
+                                                    ▼
+                                    Classification row (model_name, prompt_version…)
+
+  evaluation:  labelled dataset  →  classifier  →  metrics (macro-F1, confusion, …)
+               guarded by a regression test with a committed macro-F1 floor
+```
+
+The provider interface is uniform, so the deterministic baseline (default, hermetic),
+a local Ollama model, and the optional Anthropic backend are interchangeable — and the
+same evaluation runs against any of them.
 
 ## Portability: PostgreSQL and SQLite
 
