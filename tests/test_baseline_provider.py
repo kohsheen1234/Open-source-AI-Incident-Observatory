@@ -17,3 +17,11 @@ def test_baseline_abstains_on_thin_report():
     p = BaselineProvider()
     data = json.loads(p.generate("sys", "Report:\nnot sure what happened\n").text)
     assert data["relevance"] == "insufficient_evidence"
+
+
+def test_baseline_uses_word_boundaries_not_substrings():
+    # "lie" must not match inside "client"; the "kept" signal should win.
+    p = BaselineProvider()
+    text = "Report:\nit kept emailing the client after I told it to stop\n"
+    data = json.loads(p.generate("sys", text).text)
+    assert data["incident_type"] == "resistance_to_correction"

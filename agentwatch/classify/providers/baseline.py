@@ -1,6 +1,13 @@
 import json
+import re
 
 from agentwatch.classify.provider import LLMResult
+
+
+def _matches(keyword: str, text: str) -> bool:
+    # Prefix word-boundary match: "escalat" hits "escalated", but "lie" does not
+    # hit "client" (no word boundary before the substring).
+    return re.search(r"\b" + re.escape(keyword), text) is not None
 
 # Ordered keyword rules → (incident_type, severity, autonomy_level).
 _RULES: list[tuple[tuple[str, ...], str, int, str]] = [
@@ -50,7 +57,7 @@ class BaselineProvider:
         severity = None
         autonomy = "unknown"
         for keywords, itype, sev, auto in _RULES:
-            if any(k in text for k in keywords):
+            if any(_matches(k, text) for k in keywords):
                 incident_type, severity, autonomy = itype, sev, auto
                 break
 
