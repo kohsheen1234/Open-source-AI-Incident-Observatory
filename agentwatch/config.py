@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     reddit_client_secret: str | None = None
     ollama_host: str = "http://localhost:11434"
     ollama_model: str = "qwen2.5:7b-instruct"
+    api_key: str | None = None
 
 
 @lru_cache
