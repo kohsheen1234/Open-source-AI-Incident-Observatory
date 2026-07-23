@@ -8,8 +8,10 @@ COPY agentwatch ./agentwatch
 COPY dashboard ./dashboard
 COPY migrations ./migrations
 COPY alembic.ini ./
+COPY scripts ./scripts
 
-RUN pip install --upgrade pip && pip install ".[dashboard]"
+RUN pip install --upgrade pip && pip install ".[dashboard]" && chmod +x scripts/*.sh
 
-# Default command is the API; compose overrides the command per service.
-CMD ["agentwatch", "serve", "--host", "0.0.0.0", "--port", "8000"]
+# Default command is the API entrypoint (migrate + serve). Compose / Render override
+# with a single-token script path per service so no shell quoting is involved.
+CMD ["/app/scripts/render-api.sh"]

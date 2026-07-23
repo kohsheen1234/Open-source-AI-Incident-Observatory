@@ -18,10 +18,11 @@ services:
 
   api:
     build: ..
-    command: sh -c "alembic upgrade head && agentwatch serve --host 0.0.0.0 --port 8000"
+    command: ["/app/scripts/render-api.sh"]
     environment:
       AGENTWATCH_DATABASE_URL: postgresql+psycopg://agentwatch:agentwatch@db:5432/agentwatch
       AGENTWATCH_ARTIFACT_DIR: /data/artifacts
+      PORT: "8000"
     volumes:
       - artifacts:/data/artifacts
     depends_on:
@@ -30,9 +31,10 @@ services:
 
   dashboard:
     build: ..
-    command: streamlit run dashboard/app.py --server.port 8501 --server.address 0.0.0.0
+    command: ["/app/scripts/render-dashboard.sh"]
     environment:
       AGENTWATCH_API_URL: http://api:8000
+      PORT: "8501"
     depends_on:
       - api
 

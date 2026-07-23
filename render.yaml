@@ -11,7 +11,7 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     plan: free
-    dockerCommand: sh -c "alembic upgrade head && agentwatch serve --host 0.0.0.0 --port $PORT"
+    dockerCommand: /app/scripts/render-api.sh
     envVars:
       - key: AGENTWATCH_DATABASE_URL
         fromDatabase:
@@ -26,7 +26,7 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     plan: free
-    dockerCommand: sh -c "streamlit run dashboard/app.py --server.port $PORT --server.address 0.0.0.0"
+    dockerCommand: /app/scripts/render-dashboard.sh
     envVars:
       - key: AGENTWATCH_API_URL
         fromService:
