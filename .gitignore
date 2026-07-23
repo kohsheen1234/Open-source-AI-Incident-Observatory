@@ -12,3 +12,4 @@ artifacts/
 *.sqlite3
 
 .planning/
+site/
