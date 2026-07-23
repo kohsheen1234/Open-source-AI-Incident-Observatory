@@ -6,7 +6,16 @@
 
 **An open-source observatory for public reports of AI-agent incidents.**
 
-📖 **Live documentation:** <https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/>
+### 🔗 Live
+
+| | |
+|---|---|
+| 🖥️ **Dashboard** | <https://agentwatch-dashboard-zner.onrender.com> |
+| 📡 **API docs** | <https://agentwatch-api-7mhz.onrender.com/docs> |
+| 📖 **Documentation** | <https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/> |
+
+> The dashboard and API run on Render's free tier, which **sleeps after ~15 min idle** —
+> the first request may take 30–60s to wake, then it's fast. The docs site is always on.
 
 ![AgentWatch demo](docs/assets/demo.gif)
 
