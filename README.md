@@ -16,14 +16,14 @@ time.
 
 > ### 🔭 Project status: in active development
 >
-> **What exists today: the data foundation, the ingestion pipeline, and the
-> classification + evaluation layer.** AgentWatch can collect public reports from
-> pluggable sources, preserve each as tamper-evident hashed evidence, normalise them
-> into de-duplicated incidents, and classify each incident with a pluggable,
-> abstain-capable classifier whose quality is measured by a labelled evaluation set
-> and a prompt-regression gate. **The monitoring dashboard and the HTTP API are
-> designed but not yet implemented.** This README documents only what is actually
-> built and runnable right now, and grows as each part lands.
+> AgentWatch collects public reports from pluggable sources, preserves each as
+> tamper-evident hashed evidence, normalises them into de-duplicated incidents,
+> classifies each with a pluggable abstain-capable classifier (measured by a labelled
+> evaluation set and a prompt-regression gate), and exposes everything through a
+> documented, authenticated **HTTP API** and a **review dashboard**. Operational
+> metrics dashboards (Prometheus/Grafana) and cloud deployment are the remaining
+> planned pieces. This README documents only what is actually built and runnable
+> right now.
 >
 > Everything described below works today. Try it in five minutes with
 > [Quickstart](#quickstart).
@@ -49,6 +49,8 @@ complete and tested — provides:
 | **Pluggable classifier** | An `LLMProvider` interface with three backends: a deterministic Baseline (default, no dependencies), Ollama (local open-weight models), and optional Anthropic. Structured JSON output is validated; malformed output is retried, then abstained. |
 | **Abstain-capable taxonomy** | Ten incident types plus an explicit *insufficient_evidence* outcome, so the system distinguishes "no incident" from "not enough evidence". |
 | **Measured quality** | A labelled evaluation set with precision / recall / macro-F1 / confusion matrix / abstention rate, and a regression test that fails if macro-F1 drops below a committed floor. |
+| **Documented HTTP API** | A FastAPI service (list / filter / detail / review / stats / CSV export) with auto-generated OpenAPI docs and optional API-key auth on writes. |
+| **Review dashboard** | A Streamlit app (overview, incident explorer, review queue) that consumes the API — reviewers accept, override, or flag classifications. |
 | **Test suite** | Every component is covered by tests that run in under a second. |
 
 If you clone this repository, all of the above runs and passes. Nothing here is a
@@ -173,6 +175,43 @@ regresses quality is caught automatically.
 See [`docs/classification.md`](docs/classification.md) for the taxonomy, the providers,
 and the evaluation methodology.
 
+## The HTTP API
+
+Serve the API (auto-generated OpenAPI docs at `/docs`):
+
+```bash
+agentwatch serve --host 127.0.0.1 --port 8000
+```
+
+| Method & path | Purpose |
+|---|---|
+| `GET /health` | Liveness check |
+| `GET /incidents` | List incidents (filter by `source`, `incident_type`, `abstained`, `min_severity`; paginated with `limit`/`offset`) |
+| `GET /incidents/{id}` | Incident detail with all classifications and reviews |
+| `POST /incidents/{id}/review` | Record a human review (`accept` / `override` / `false_positive`) |
+| `GET /stats` | Summary counts and abstention rate |
+| `GET /exports/incidents.csv` | Export incidents as CSV |
+
+Reads are public. If `AGENTWATCH_API_KEY` is set, writes (review) and CSV export
+require an `X-API-Key` header — so a reviewer can run it locally with zero config,
+while production can lock it down.
+
+## The dashboard
+
+The Streamlit dashboard consumes the API (it never touches the database directly):
+
+```bash
+# In one terminal: run the API
+agentwatch serve
+# In another: run the dashboard (install the extra first)
+pip install -e ".[dashboard]"
+AGENTWATCH_API_URL=http://localhost:8000 streamlit run dashboard/app.py
+```
+
+Pages: **Overview** (headline metrics + incidents-by-type chart), **Incident Explorer**
+(filterable table), and **Review Queue** (open an incident, see its evidence and
+classification, and submit a review).
+
 ## Configuration
 
 All configuration is read from environment variables prefixed `AGENTWATCH_`
@@ -187,11 +226,14 @@ All configuration is read from environment variables prefixed `AGENTWATCH_`
 | `AGENTWATCH_ENVIRONMENT` | `local` | Deployment environment label |
 | `AGENTWATCH_REDDIT_CLIENT_ID` | _(unset)_ | Enables the opt-in Reddit source |
 | `AGENTWATCH_REDDIT_CLIENT_SECRET` | _(unset)_ | Enables the opt-in Reddit source |
+| `AGENTWATCH_API_KEY` | _(unset)_ | If set, required (`X-API-Key`) for API writes and export |
+| `AGENTWATCH_API_URL` | `http://localhost:8000` | API base URL the dashboard talks to |
 
 ## Tech stack
 
-Python 3.12 · SQLAlchemy 2.0 · Alembic · Pydantic · httpx · tenacity · APScheduler ·
-structlog · PostgreSQL 16 · Docker Compose · pytest · ruff.
+Python 3.12 · SQLAlchemy 2.0 · Alembic · Pydantic · FastAPI · uvicorn · Streamlit ·
+httpx · tenacity · APScheduler · structlog · PostgreSQL 16 · Docker Compose ·
+pytest · ruff.
 
 ## Documentation
 
@@ -222,10 +264,12 @@ agentwatch/        # the package
   pipeline/        # ingest (persist/normalise/dedupe) + collection orchestration
   classify/        # taxonomy, prompt, providers (baseline/ollama/anthropic), classifier
   eval/            # labelled dataset, metrics, evaluation runner
+  api/             # FastAPI app, schemas, queries, auth
   sources.py       # source + provider registry / defaults
   cli.py           # `agentwatch` command-line interface
   scheduler.py     # APScheduler-based recurring collection
   db/              # SQLAlchemy models, base, portable types, session management
+dashboard/         # Streamlit dashboard + API client
 migrations/        # Alembic migration environment and versions
 deploy/            # docker-compose service definitions
 docs/              # MkDocs documentation site

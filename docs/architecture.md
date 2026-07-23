@@ -1,7 +1,7 @@
 # Architecture
 
-This page describes the components that exist **today**. As new layers
-(the dashboard and the HTTP API) are built, they will be documented here.
+This page describes the components that exist **today**. As new layers (operational
+metrics dashboards and cloud deployment) are built, they will be documented here.
 
 ## The foundation layer
 
@@ -117,6 +117,30 @@ harness. See [Classification & evaluation](classification.md); in short:
 The provider interface is uniform, so the deterministic baseline (default, hermetic),
 a local Ollama model, and the optional Anthropic backend are interchangeable — and the
 same evaluation runs against any of them.
+
+## The web layer
+
+Stored, classified incidents are exposed through a FastAPI service, and a Streamlit
+dashboard consumes that API. See [API & dashboard](api.md).
+
+```text
+  PostgreSQL / SQLite
+        ▲
+        │ queries (agentwatch/api/queries.py)
+        │
+  FastAPI app (agentwatch/api/app.py)
+   GET /incidents · GET /incidents/{id} · POST /incidents/{id}/review
+   GET /stats · GET /exports/incidents.csv · GET /health
+   (writes/export gated by X-API-Key when AGENTWATCH_API_KEY is set)
+        ▲
+        │ HTTP (AgentWatchClient)
+        │
+  Streamlit dashboard (dashboard/app.py)
+   Overview · Incident Explorer · Review Queue
+```
+
+The dashboard never touches the database directly — it uses the same API that any
+external consumer would, so the API is the single access layer.
 
 ## Portability: PostgreSQL and SQLite
 

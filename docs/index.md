@@ -14,10 +14,12 @@ searchable, and analysable record.
 !!! info "Project status: in active development"
     This documentation describes **only what is built and runnable today** — the data
     foundation, the ingestion pipeline (pluggable collectors, evidence storage,
-    normalisation, scheduled collection), and the classification + evaluation layer
-    (pluggable abstain-capable classifier, labelled eval set, regression gate). The
-    monitoring dashboard and the HTTP API are designed but not yet implemented. The
-    docs grow as each part lands, so nothing here is aspirational.
+    normalisation, scheduled collection), the classification + evaluation layer
+    (pluggable abstain-capable classifier, labelled eval set, regression gate), and
+    the web layer (a documented, authenticated HTTP API and a Streamlit review
+    dashboard). Operational metrics dashboards (Prometheus/Grafana) and cloud
+    deployment are the remaining planned pieces. The docs grow as each part lands, so
+    nothing here is aspirational.
 
 ## Why separate raw evidence from interpretation?
 
@@ -41,5 +43,6 @@ came from, and you always know whether a label came from a machine or a person.
   fit together.
 - **[Collecting data](collection.md)** — the sources, the pipeline, and how to run it.
 - **[Classification & evaluation](classification.md)** — the taxonomy, providers, and how quality is measured.
+- **[API & dashboard](api.md)** — the HTTP API, authentication, and the review dashboard.
 - **[Data model](data-model.md)** — the full, table-by-table schema reference.
 - **[Development](development.md)** — how to install, test, and extend the project.

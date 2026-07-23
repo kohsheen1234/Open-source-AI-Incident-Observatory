@@ -29,5 +29,6 @@ nav:
   - Architecture: architecture.md
   - Collecting data: collection.md
   - Classification & evaluation: classification.md
+  - API & dashboard: api.md
   - Data model: data-model.md
   - Development: development.md
