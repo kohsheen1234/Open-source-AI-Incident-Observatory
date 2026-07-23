@@ -62,6 +62,17 @@ docker compose -f deploy/docker-compose.yml exec ollama ollama pull qwen2.5:7b-i
 Then classify with `--provider ollama` (point the app at `http://ollama:11434` via
 `AGENTWATCH_OLLAMA_HOST`).
 
+## Hosted options
+
+- **Documentation site** — published automatically to GitHub Pages by the
+  [`docs` workflow](https://github.com/kohsheen1234/Open-source-AI-Incident-Observatory/actions/workflows/docs.yml)
+  on every push to `main`:
+  <https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/>.
+- **Interactive app (one click)** — the [`render.yaml`](https://github.com/kohsheen1234/Open-source-AI-Incident-Observatory/blob/main/render.yaml)
+  blueprint provisions the API, the dashboard, and a managed Postgres on
+  [Render](https://render.com). The app connects to a `postgres://` URL, which
+  AgentWatch normalises to a psycopg3 SQLAlchemy URL automatically.
+
 ## Deploying to a VPS with HTTPS
 
 1. Provision a small VPS (e.g. Hetzner/DigitalOcean) with Docker installed, and point

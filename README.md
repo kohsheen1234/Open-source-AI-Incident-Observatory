@@ -1,6 +1,12 @@
 # AgentWatch
 
+[![CI](https://github.com/kohsheen1234/Open-source-AI-Incident-Observatory/actions/workflows/ci.yml/badge.svg)](https://github.com/kohsheen1234/Open-source-AI-Incident-Observatory/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-live-blue)](https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/)
+[![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/)
+
 **An open-source observatory for public reports of AI-agent incidents.**
+
+📖 **Live documentation:** <https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/>
 
 As AI systems increasingly act on their own — running tools, taking actions, and
 operating with growing autonomy — people are posting about what happens when those
@@ -27,6 +33,17 @@ time.
 > [one command](#run-the-whole-system) brings up the full stack.
 
 ---
+
+## Live demo & deployment
+
+- **Documentation site (live):** <https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/> — published automatically from `main` via GitHub Actions.
+- **Run the interactive app yourself:** one `make up` locally (below), or one-click to the cloud:
+
+  [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/kohsheen1234/Open-source-AI-Incident-Observatory)
+
+  The [`render.yaml`](render.yaml) blueprint provisions the API, the dashboard, and a
+  managed Postgres. (A live interactive app needs a host account; the docs site above
+  is always-on and needs nothing.)
 
 ## Run the whole system
 
@@ -275,6 +292,14 @@ To preview the docs site locally:
 pip install -e ".[docs]"
 mkdocs serve
 ```
+
+## Continuous integration
+
+Every push and pull request runs [GitHub Actions](.github/workflows/ci.yml): `ruff`
+linting and the full `pytest` suite — which **includes the classifier evaluation
+regression gate**, so a change that drops macro-F1 below the committed floor fails CI.
+A separate [docs workflow](.github/workflows/docs.yml) builds the MkDocs site with
+`--strict` and publishes it to GitHub Pages on every push to `main`.
 
 ## Project layout
 

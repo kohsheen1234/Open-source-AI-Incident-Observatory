@@ -1,5 +1,6 @@
 site_name: AgentWatch
 site_description: An open-source observatory for public reports of AI-agent incidents.
+site_url: https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/
 theme:
   name: material
   palette:
