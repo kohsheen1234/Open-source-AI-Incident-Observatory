@@ -23,6 +23,7 @@ def _classification_out(cls) -> ClassificationOut | None:
         severity=cls.severity,
         confidence=cls.confidence,
         abstained=cls.abstained,
+        reasoning_summary=cls.reasoning_summary,
         model_name=cls.model_name,
         prompt_version=cls.prompt_version,
     )

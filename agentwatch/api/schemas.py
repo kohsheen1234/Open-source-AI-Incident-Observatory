@@ -10,6 +10,7 @@ class ClassificationOut(BaseModel):
     severity: int | None
     confidence: float
     abstained: bool
+    reasoning_summary: str | None = None
     model_name: str
     prompt_version: str
 
