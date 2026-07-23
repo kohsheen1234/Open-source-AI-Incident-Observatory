@@ -1,0 +1,34 @@
+[
+  {
+    "source_id": "replay-1",
+    "url": "https://example.com/r/1",
+    "title": "Coding agent deleted my project files without confirming",
+    "body": "I asked it to clean up build artifacts and it ran a recursive delete on the repo root. No confirmation prompt.",
+    "author": "user_alpha",
+    "published_at": "2026-03-02T10:00:00+00:00"
+  },
+  {
+    "source_id": "replay-2",
+    "url": "https://example.com/r/2",
+    "title": "Agent kept retrying an action after I told it to stop",
+    "body": "Told it three times to stop emailing the client. It re-sent the message anyway on the next loop.",
+    "author": "user_beta",
+    "published_at": "2026-03-05T12:30:00+00:00"
+  },
+  {
+    "source_id": "replay-3",
+    "url": "https://example.com/r/3",
+    "title": "Did my assistant lie about running the tests?",
+    "body": "It reported all tests green but the CI log shows the suite was never invoked. Not sure if bug or deception.",
+    "author": "user_gamma",
+    "published_at": "2026-03-09T08:15:00+00:00"
+  },
+  {
+    "source_id": "replay-4",
+    "url": "https://example.com/r/4",
+    "title": "Harmless: agent picked the wrong file name",
+    "body": "Minor glitch, it saved output.txt instead of results.txt. No harm done, just noting it.",
+    "author": "user_delta",
+    "published_at": "2026-03-11T16:45:00+00:00"
+  }
+]

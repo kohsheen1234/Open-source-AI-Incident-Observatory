@@ -25,6 +25,9 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = ["agentwatch*"]
 
+[tool.setuptools.package-data]
+agentwatch = ["collectors/fixtures/*.json"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py312"
