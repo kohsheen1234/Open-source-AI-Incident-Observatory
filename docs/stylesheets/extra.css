@@ -1,70 +1,107 @@
-/* AgentWatch docs — Supabase-inspired dark theme. */
+/* AgentWatch docs — matches the web app: cool near-black + teal, thin Inter, mono labels. */
 
 [data-md-color-scheme="slate"] {
-  --md-hue: 0;
-  --md-default-bg-color: #1c1c1c;
-  --md-default-fg-color: #ededed;
-  --md-default-fg-color--light: #a0a0a0;
-  --md-default-fg-color--lighter: #6f6f6f;
+  --md-default-bg-color: #0b0d0d;
+  --md-default-fg-color: #e9eceb;
+  --md-default-fg-color--light: #8fa0a0;
+  --md-default-fg-color--lighter: #5b6666;
 
-  --md-primary-fg-color: #181818;
-  --md-primary-bg-color: #ededed;
+  --md-primary-fg-color: #0b0d0d;
+  --md-primary-bg-color: #e9eceb;
 
-  --md-accent-fg-color: #3ecf8e;
+  --md-accent-fg-color: #18b2ba;
 
-  --md-typeset-color: #d6d6d6;
-  --md-typeset-a-color: #3ecf8e;
+  --md-typeset-color: #cdd6d4;
+  --md-typeset-a-color: #18b2ba;
 
-  --md-code-bg-color: #141414;
-  --md-code-fg-color: #e6e6e6;
+  --md-code-bg-color: #131717;
+  --md-code-fg-color: #e3e8e6;
 
-  --md-footer-bg-color: #141414;
+  --md-footer-bg-color: #0e1111;
 }
 
-/* Hairline borders + tighter display type, matching the dashboard. */
-.md-header {
-  background: #171717;
-  border-bottom: 1px solid #2e2e2e;
+/* Cool volumetric glow behind the content, like the app hero. */
+.md-main {
+  background:
+    radial-gradient(60% 40% at 50% -6%, rgba(24, 178, 186, 0.10), transparent 60%),
+    radial-gradient(40% 30% at 12% 2%, rgba(206, 47, 0, 0.045), transparent 60%);
+}
+
+/* Header + tabs: dark with a hairline, no shadow. */
+.md-header,
+.md-tabs {
+  background: #0b0d0d;
   box-shadow: none;
 }
-.md-tabs { background: #171717; }
-
-.md-typeset h1,
-.md-typeset h2,
-.md-typeset h3 {
-  letter-spacing: -0.02em;
-  font-weight: 700;
+.md-header {
+  border-bottom: 1px solid #242b2b;
 }
-.md-typeset h1 { color: #ffffff; }
 
-/* Green accent for the section/nav active state and focus rings. */
+/* Thin, wide display headings — the app's editorial voice. */
+.md-typeset h1 {
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+.md-typeset h2 {
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.md-typeset h3 {
+  font-weight: 500;
+}
+
+/* Teal accents for nav state + focus. */
 .md-nav__link--active,
 .md-nav__link:focus,
-.md-nav__link:hover { color: #3ecf8e; }
+.md-nav__link:hover {
+  color: #18b2ba;
+}
 
-/* Code + inline code on hairline panels. */
+/* Code on cool hairline panels; Martian Mono via theme.font.code. */
 .md-typeset pre > code,
 .md-typeset code {
-  border: 1px solid #2e2e2e;
+  border: 1px solid #242b2b;
   border-radius: 8px;
 }
 
-/* Tables as dark hairline cards. */
+/* Tables styled as dark hairline cards with mono uppercase headers. */
 .md-typeset table:not([class]) {
-  border: 1px solid #2e2e2e;
+  border: 1px solid #242b2b;
   border-radius: 10px;
   overflow: hidden;
+  background: #131717;
 }
 .md-typeset table:not([class]) th {
-  background: #202020;
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.75rem;
+  background: #181d1d;
+  font-family: "Martian Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #a0a0a0;
+  letter-spacing: 0.08em;
+  color: #8fa0a0;
+  font-weight: 400;
 }
 
-/* Primary buttons / admonition accents in brand green. */
+/* Admonitions in the teal accent. */
+.md-typeset .admonition,
+.md-typeset details {
+  border-color: #242b2b;
+  background: #131717;
+  border-radius: 10px;
+}
 .md-typeset .admonition.info,
-.md-typeset details.info { border-color: #3ecf8e; }
-.md-typeset .admonition-title { background: rgba(62, 207, 142, 0.1); }
+.md-typeset details.info {
+  border-color: rgba(24, 178, 186, 0.5);
+}
+.md-typeset .admonition.info > .admonition-title,
+.md-typeset details.info > summary {
+  background: rgba(24, 178, 186, 0.1);
+}
+
+/* Buttons / primary links pick up the teal. */
+.md-typeset .md-button--primary {
+  background: #18b2ba;
+  border-color: #18b2ba;
+  color: #04201f;
+}
