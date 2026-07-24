@@ -67,17 +67,15 @@ export function Overview({ onExplore }: { onExplore?: () => void }) {
       {/* Hero */}
       <section className="text-center max-w-3xl mx-auto pt-6 pb-4">
         <div className="eyebrow mb-4">Live · AI-agent incident monitoring</div>
-        <h1 className="font-display uppercase text-5xl md:text-8xl leading-[0.9] tracking-tight">
+        <h1 className="font-extralight uppercase text-5xl md:text-7xl leading-[1.02] tracking-[0.01em]">
           <span className="grad-text">The observatory for</span>
           <br />
           <span className="text-ink">AI-agent incidents</span>
         </h1>
         <p className="text-muted text-lg leading-relaxed mt-7 max-w-2xl mx-auto">
-          As AI systems increasingly act on their own, people post when they{" "}
-          <span className="font-serif italic text-ink">misbehave</span> — deleting files, ignoring
-          instructions, acting without permission. AgentWatch turns those scattered, disappearing
-          reports into a durable, <span className="font-serif italic text-ink">measurable</span>{" "}
-          evidence base.
+          As AI systems increasingly act on their own, people post when they misbehave — deleting
+          files, ignoring instructions, acting without permission. AgentWatch turns those scattered,
+          disappearing reports into a durable, measurable evidence base.
         </p>
         <div className="flex flex-wrap gap-3 justify-center mt-8">
           <PrimaryButton onClick={onExplore}>Explore incidents →</PrimaryButton>

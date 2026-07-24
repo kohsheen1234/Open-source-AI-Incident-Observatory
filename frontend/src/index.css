@@ -14,51 +14,51 @@ body,
 
 body {
   margin: 0;
-  background-color: #0a0806;
-  color: #f6efe4;
+  background-color: #0b0d0d;
+  color: #e9eceb;
   font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Cinematic, volumetric "spice" glow — warm amber/orange drifting on near-black. */
+/* Cool, subtle volumetric glow — teal with a faint ember, on near-black. */
 .page-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(65% 55% at 50% -8%, rgba(245, 165, 36, 0.22), transparent 68%),
-    radial-gradient(45% 45% at 82% 2%, rgba(255, 122, 24, 0.16), transparent 66%),
-    radial-gradient(48% 48% at 12% 6%, rgba(242, 120, 47, 0.12), transparent 66%),
-    #0a0806;
-  animation: drift 22s ease-in-out infinite alternate;
+    radial-gradient(60% 50% at 50% -8%, rgba(24, 178, 186, 0.14), transparent 66%),
+    radial-gradient(42% 42% at 84% 2%, rgba(24, 178, 186, 0.08), transparent 64%),
+    radial-gradient(44% 44% at 12% 4%, rgba(206, 47, 0, 0.06), transparent 64%),
+    #0b0d0d;
+  animation: drift 24s ease-in-out infinite alternate;
 }
 @keyframes drift {
   from {
-    transform: translateY(-10px) scale(1);
+    transform: translateY(-8px) scale(1);
     opacity: 0.9;
   }
   to {
-    transform: translateY(24px) scale(1.06);
+    transform: translateY(20px) scale(1.05);
     opacity: 1;
   }
 }
 
-/* Fine film grain over everything for a cinematic texture. */
 .grain {
   position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.05;
+  opacity: 0.04;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Warm gradient display text — the signature. */
+/* Cool gradient display text — white into teal. */
 .grad-text {
-  background: linear-gradient(96deg, #fff6e8 0%, #ffd27a 42%, #f5a524 70%, #ff7a18 100%);
+  background: linear-gradient(100deg, #ffffff 0%, #cfeef0 42%, #18b2ba 78%, #12949b 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -67,9 +67,10 @@ body {
 
 .eyebrow {
   font-family: "Martian Mono", ui-monospace, monospace;
-  color: #f5a524;
-  font-size: 0.68rem;
-  letter-spacing: 0.22em;
+  font-weight: 400;
+  color: #18b2ba;
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
 }
 
@@ -78,7 +79,7 @@ body {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2b241c;
+  background: #242b2b;
   border-radius: 6px;
 }
 ::-webkit-scrollbar-track {
@@ -86,7 +87,7 @@ body {
 }
 
 a {
-  color: #f5a524;
+  color: #18b2ba;
   text-decoration: none;
 }
 a:hover {
@@ -94,7 +95,7 @@ a:hover {
 }
 
 *:focus-visible {
-  outline: 2px solid #f5a524;
+  outline: 2px solid #18b2ba;
   outline-offset: 2px;
   border-radius: 4px;
 }

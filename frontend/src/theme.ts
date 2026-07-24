@@ -1,22 +1,22 @@
 export const TYPE_COLORS: Record<string, string> = {
-  destructive_action: "#e4572e",
-  privilege_escalation: "#f3a712",
-  sandbox_escape: "#d7263d",
-  deception: "#8f2d56",
-  resistance_to_correction: "#3f88c5",
-  unauthorized_action: "#2e86ab",
-  goal_persistence: "#5b8c5a",
-  resource_acquisition: "#8367c7",
-  harmless_malfunction: "#9aa5b1",
-  insufficient_evidence: "#c9ced6",
+  destructive_action: "#ce2f00",
+  privilege_escalation: "#c96f4a",
+  sandbox_escape: "#e5484d",
+  deception: "#a05195",
+  resistance_to_correction: "#4c8dc9",
+  unauthorized_action: "#2f9e9e",
+  goal_persistence: "#5aa17f",
+  resource_acquisition: "#8b6fd1",
+  harmless_malfunction: "#7c8a8a",
+  insufficient_evidence: "#94a3a1",
 };
 
 export const SEV_COLORS: Record<number, string> = {
-  1: "#f5d27a",
-  2: "#f5a524",
-  3: "#f2812f",
-  4: "#e4572e",
-  5: "#d7263d",
+  1: "#18b2ba",
+  2: "#4aa0a6",
+  3: "#c2603f",
+  4: "#d24422",
+  5: "#ce2f00",
 };
 
 export const INCIDENT_TYPES: Record<string, string> = {

@@ -19,7 +19,7 @@ export function StatCard({ label, value, hint }: { label: string; value: ReactNo
   return (
     <Card className="p-5">
       <div className="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-faint">{label}</div>
-      <div className="font-display text-4xl text-ink mt-2 tabular-nums">{value}</div>
+      <div className="text-4xl font-light text-ink mt-2 tabular-nums">{value}</div>
       {hint && <div className="text-xs text-muted mt-1">{hint}</div>}
     </Card>
   );
@@ -59,7 +59,7 @@ export function PrimaryButton({
   href?: string;
 }) {
   const cls =
-    "inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-[#1c1206] hover:bg-[#ffbb4d] transition-colors no-underline";
+    "inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-[#04201f] hover:bg-[#2ccdd6] transition-colors no-underline";
   return href ? (
     <a className={cls} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer">
       {children}
@@ -97,7 +97,7 @@ export function SectionHeader({ eyebrow, title }: { eyebrow?: string; title: str
   return (
     <div className="mb-4">
       {eyebrow && <div className="eyebrow mb-2">{eyebrow}</div>}
-      <h2 className="font-display uppercase text-3xl md:text-4xl text-ink tracking-tight leading-none">
+      <h2 className="font-light uppercase text-3xl md:text-4xl text-ink tracking-[0.02em] leading-none">
         {title}
       </h2>
     </div>

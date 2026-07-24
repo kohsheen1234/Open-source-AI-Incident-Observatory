@@ -20,7 +20,7 @@ import { sevColor, typeColor } from "./theme";
 
 const AXIS = "#8a8072";
 const GRID = "#2b241c";
-const SOURCE_COLORS = ["#f5a524", "#ff7a18", "#e4a94b", "#c77d3a"];
+const SOURCE_COLORS = ["#18b2ba", "#ce2f00", "#5aa17f", "#4c8dc9"];
 
 const tooltipStyle = {
   backgroundColor: "#1b1611",
@@ -70,15 +70,15 @@ export function TimeArea({ data }: { data: { date: string; count: number }[] }) 
       <AreaChart data={data} margin={{ left: 4, right: 16 }}>
         <defs>
           <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f5a524" stopOpacity={0.4} />
-            <stop offset="100%" stopColor="#f5a524" stopOpacity={0} />
+            <stop offset="0%" stopColor="#18b2ba" stopOpacity={0.4} />
+            <stop offset="100%" stopColor="#18b2ba" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid stroke={GRID} />
         <XAxis dataKey="date" stroke={AXIS} fontSize={12} />
         <YAxis stroke={AXIS} fontSize={12} allowDecimals={false} />
         <Tooltip contentStyle={tooltipStyle} />
-        <Area isAnimationActive={false} type="monotone" dataKey="count" stroke="#f5a524" strokeWidth={2} fill="url(#g)" />
+        <Area isAnimationActive={false} type="monotone" dataKey="count" stroke="#18b2ba" strokeWidth={2} fill="url(#g)" />
       </AreaChart>
     </ResponsiveContainer>
   );
