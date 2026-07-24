@@ -1,4 +1,4 @@
-from dashboard.client import AgentWatchClient
+from dashboard.client import AgentWatchClient, APIUnavailable
 
 # Plain-language descriptions of each incident category, shown in the UI so a
 # first-time visitor understands what the labels mean.
@@ -182,12 +182,21 @@ def render() -> None:
     page = _sidebar(st)
     st.title("AgentWatch — AI Incident Observatory")
 
-    if page == "Overview":
-        _render_overview(st, api)
-    elif page == "Incident Explorer":
-        _render_explorer(st, api)
-    elif page == "Review Queue":
-        _render_review(st, api)
+    try:
+        if page == "Overview":
+            _render_overview(st, api)
+        elif page == "Incident Explorer":
+            _render_explorer(st, api)
+        elif page == "Review Queue":
+            _render_review(st, api)
+    except APIUnavailable:
+        st.warning(
+            "⏳ The API isn't responding yet. This demo runs on Render's free tier, "
+            "where services sleep after ~15 minutes of inactivity and take 30–60s to "
+            "wake up. Give it a moment and retry."
+        )
+        if st.button("Retry"):
+            st.rerun()
 
 
 if __name__ == "__main__":

@@ -54,6 +54,29 @@ def _seed(monkeypatch, tmp_path):
         )
 
 
+def test_client_raises_apiunavailable_on_error(monkeypatch):
+    import pytest
+
+    import dashboard.client as c
+
+    monkeypatch.setattr(c.time, "sleep", lambda *a, **k: None)  # no waiting in tests
+
+    class BadResp:
+        def raise_for_status(self):
+            raise RuntimeError("502 Bad Gateway (cold start)")
+
+        def json(self):
+            return {}
+
+    class BadClient:
+        def get(self, *a, **k):
+            return BadResp()
+
+    api = c.AgentWatchClient(client=BadClient())
+    with pytest.raises(c.APIUnavailable):
+        api.stats()
+
+
 def test_client_reads_and_reviews(monkeypatch, tmp_path):
     _seed(monkeypatch, tmp_path)
     api = AgentWatchClient(client=TestClient(create_app()))
