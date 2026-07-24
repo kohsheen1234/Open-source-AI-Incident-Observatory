@@ -60,13 +60,17 @@ time.
 
 ## Screenshots
 
-| Dashboard — Overview | Dashboard — Incident Explorer |
+| Overview | How it works (methodology) |
 |---|---|
-| ![Overview](docs/assets/screenshots/01-overview.png) | ![Incident Explorer](docs/assets/screenshots/02-explorer.png) |
+| ![Overview](docs/assets/screenshots/01-overview.png) | ![Methodology](docs/assets/screenshots/06-methodology.png) |
 
-| Dashboard — Review Queue | API — OpenAPI docs | Grafana — metrics |
-|---|---|---|
-| ![Review Queue](docs/assets/screenshots/03-review.png) | ![API docs](docs/assets/screenshots/04-api-docs.png) | ![Grafana](docs/assets/screenshots/05-grafana.png) |
+| Incident Explorer | Review Queue |
+|---|---|
+| ![Incident Explorer](docs/assets/screenshots/02-explorer.png) | ![Review Queue](docs/assets/screenshots/03-review.png) |
+
+| API — OpenAPI docs | Grafana — metrics |
+|---|---|
+| ![API docs](docs/assets/screenshots/04-api-docs.png) | ![Grafana](docs/assets/screenshots/05-grafana.png) |
 
 ## Run the whole system
 
