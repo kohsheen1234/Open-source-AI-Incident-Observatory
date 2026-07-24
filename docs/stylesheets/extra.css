@@ -1,0 +1,70 @@
+/* AgentWatch docs — Supabase-inspired dark theme. */
+
+[data-md-color-scheme="slate"] {
+  --md-hue: 0;
+  --md-default-bg-color: #1c1c1c;
+  --md-default-fg-color: #ededed;
+  --md-default-fg-color--light: #a0a0a0;
+  --md-default-fg-color--lighter: #6f6f6f;
+
+  --md-primary-fg-color: #181818;
+  --md-primary-bg-color: #ededed;
+
+  --md-accent-fg-color: #3ecf8e;
+
+  --md-typeset-color: #d6d6d6;
+  --md-typeset-a-color: #3ecf8e;
+
+  --md-code-bg-color: #141414;
+  --md-code-fg-color: #e6e6e6;
+
+  --md-footer-bg-color: #141414;
+}
+
+/* Hairline borders + tighter display type, matching the dashboard. */
+.md-header {
+  background: #171717;
+  border-bottom: 1px solid #2e2e2e;
+  box-shadow: none;
+}
+.md-tabs { background: #171717; }
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+.md-typeset h1 { color: #ffffff; }
+
+/* Green accent for the section/nav active state and focus rings. */
+.md-nav__link--active,
+.md-nav__link:focus,
+.md-nav__link:hover { color: #3ecf8e; }
+
+/* Code + inline code on hairline panels. */
+.md-typeset pre > code,
+.md-typeset code {
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+}
+
+/* Tables as dark hairline cards. */
+.md-typeset table:not([class]) {
+  border: 1px solid #2e2e2e;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.md-typeset table:not([class]) th {
+  background: #202020;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #a0a0a0;
+}
+
+/* Primary buttons / admonition accents in brand green. */
+.md-typeset .admonition.info,
+.md-typeset details.info { border-color: #3ecf8e; }
+.md-typeset .admonition-title { background: rgba(62, 207, 142, 0.1); }

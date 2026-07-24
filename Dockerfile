@@ -9,6 +9,7 @@ COPY dashboard ./dashboard
 COPY migrations ./migrations
 COPY alembic.ini ./
 COPY scripts ./scripts
+COPY .streamlit ./.streamlit
 
 RUN pip install --upgrade pip && pip install ".[dashboard]" && chmod +x scripts/*.sh
 

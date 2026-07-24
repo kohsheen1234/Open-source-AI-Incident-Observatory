@@ -54,7 +54,79 @@ TYPE_COLORS = {
 }
 
 # Severity 1 (minor) → 5 (critical).
-SEV_COLORS = {1: "#5b8c5a", 2: "#a3b18a", 3: "#f3a712", 4: "#e4572e", 5: "#d7263d"}
+SEV_COLORS = {1: "#3ECF8E", 2: "#a3d9b1", 3: "#f3a712", 4: "#e4572e", 5: "#d7263d"}
+
+# Supabase-inspired dark theme injected as CSS.
+_CSS = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+html, body, [class*="css"], .stApp, .stMarkdown, p, span, div { font-family: 'Inter', sans-serif; }
+.stApp { background-color: #1C1C1C; }
+
+/* subtle green glow behind the hero */
+.stApp::before {
+  content: ""; position: fixed; top: -220px; left: 50%; transform: translateX(-50%);
+  width: 900px; height: 420px; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at center, rgba(62,207,142,0.13), rgba(62,207,142,0) 70%);
+}
+.block-container { padding-top: 2.2rem; }
+h1, h2, h3, h4 { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; font-weight: 700; }
+h1 { color: #FFFFFF; }
+
+/* metric cards */
+[data-testid="stMetric"] {
+  background: #181818; border: 1px solid #2E2E2E; border-radius: 12px; padding: 14px 18px;
+}
+[data-testid="stMetricLabel"] p {
+  color: #A0A0A0; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+[data-testid="stMetricValue"] { color: #EDEDED; font-weight: 700; }
+
+/* sidebar */
+[data-testid="stSidebar"] { background: #171717; border-right: 1px solid #2E2E2E; }
+[data-testid="stSidebar"] .stRadio label { color: #EDEDED; }
+
+/* buttons */
+.stButton > button {
+  background: #3ECF8E; color: #0B0F0D; border: none; border-radius: 8px; font-weight: 600;
+}
+.stButton > button:hover { background: #34B87C; color: #0B0F0D; }
+
+/* links, dividers, tabs, expanders */
+a, a:visited { color: #3ECF8E !important; }
+hr { border-color: #2E2E2E; }
+[data-testid="stExpander"] { border: 1px solid #2E2E2E; border-radius: 10px; background: #181818; }
+.stTabs [data-baseweb="tab-list"] { gap: 4px; }
+.stTabs [aria-selected="true"] { color: #3ECF8E; }
+[data-testid="stDataFrame"] { border: 1px solid #2E2E2E; border-radius: 10px; }
+
+/* caption tint */
+[data-testid="stCaptionContainer"], .stCaption { color: #8B8B8B; }
+
+/* monospace green eyebrow */
+.aw-eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace; color: #3ECF8E;
+  font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500;
+}
+</style>
+"""
+
+
+def _style_fig(fig, height: int = 340):
+    """Apply the dark Supabase-style chart theme."""
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#EDEDED", family="Inter"),
+        height=height,
+        margin=dict(l=0, r=0, t=10, b=0),
+    )
+    fig.update_xaxes(gridcolor="#2E2E2E", zerolinecolor="#2E2E2E")
+    fig.update_yaxes(gridcolor="#2E2E2E", zerolinecolor="#2E2E2E")
+    return fig
 
 
 def _clean_text(s: str | None) -> str:
@@ -162,6 +234,8 @@ def _glossary(st):
 def _render_overview(st, api):
     import plotly.express as px
 
+    st.markdown('<div class="aw-eyebrow">Live · AI-agent incident monitoring</div>',
+                unsafe_allow_html=True)
     st.markdown(MISSION)
     st.markdown("#### How it works")
     _pipeline_strip(st)
@@ -197,21 +271,18 @@ def _render_overview(st, api):
             counts, x="count", y="type", orientation="h",
             color="type", color_discrete_map=TYPE_COLORS,
         )
-        fig.update_layout(
-            showlegend=False, template="plotly_white", height=380,
-            margin=dict(l=0, r=0, t=10, b=0), yaxis_title="", xaxis_title="incidents",
-        )
+        _style_fig(fig, height=380)
+        fig.update_layout(showlegend=False, yaxis_title="", xaxis_title="incidents")
         fig.update_yaxes(categoryorder="total ascending")
         st.plotly_chart(fig, use_container_width=True)
     with right:
         st.subheader("By source")
         src = df["source"].value_counts().reset_index()
         src.columns = ["source", "count"]
-        fig = px.pie(src, names="source", values="count", hole=0.55)
-        fig.update_layout(
-            template="plotly_white", height=380, margin=dict(l=0, r=0, t=10, b=0),
-            legend=dict(orientation="h", y=-0.1),
-        )
+        fig = px.pie(src, names="source", values="count", hole=0.55,
+                     color_discrete_sequence=["#3ECF8E", "#3f88c5", "#f3a712", "#8367c7"])
+        _style_fig(fig, height=380)
+        fig.update_layout(legend=dict(orientation="h", y=-0.1))
         st.plotly_chart(fig, use_container_width=True)
 
     tab_time, tab_sev, tab_conf, tab_mix, tab_scatter = st.tabs(
@@ -226,9 +297,9 @@ def _render_overview(st, api):
             ts["date"] = ts["published_at"].dt.date
             series = ts.groupby("date").size().reset_index(name="incidents")
             fig = px.area(series, x="date", y="incidents", markers=True)
-            fig.update_traces(line_color="#2e86ab")
-            fig.update_layout(template="plotly_white", height=320,
-                              margin=dict(l=0, r=0, t=10, b=0), xaxis_title="", yaxis_title="")
+            fig.update_traces(line_color="#3ECF8E", fillcolor="rgba(62,207,142,0.15)")
+            _style_fig(fig, height=320)
+            fig.update_layout(xaxis_title="", yaxis_title="")
             st.plotly_chart(fig, use_container_width=True)
     with tab_sev:
         st.caption("How severe the classified incidents are (1 = minor, 5 = critical).")
@@ -240,8 +311,8 @@ def _render_overview(st, api):
             sc.columns = ["severity", "count"]
             fig = px.bar(sc, x="severity", y="count", color="severity",
                          color_continuous_scale="OrRd")
-            fig.update_layout(template="plotly_white", height=320, coloraxis_showscale=False,
-                              margin=dict(l=0, r=0, t=10, b=0))
+            _style_fig(fig, height=320)
+            fig.update_layout(coloraxis_showscale=False)
             st.plotly_chart(fig, use_container_width=True)
     with tab_conf:
         st.caption("How confident the classifier was. Low-confidence items are worth reviewing.")
@@ -250,9 +321,9 @@ def _render_overview(st, api):
             st.info("No confidence values yet.")
         else:
             fig = px.histogram(conf, x="confidence", nbins=20)
-            fig.update_traces(marker_color="#3f88c5")
-            fig.update_layout(template="plotly_white", height=320,
-                              margin=dict(l=0, r=0, t=10, b=0), yaxis_title="incidents")
+            fig.update_traces(marker_color="#3ECF8E")
+            _style_fig(fig, height=320)
+            fig.update_layout(yaxis_title="incidents")
             st.plotly_chart(fig, use_container_width=True)
     with tab_mix:
         st.caption("The relative mix of incident types — area is proportional to count.")
@@ -260,7 +331,7 @@ def _render_overview(st, api):
         counts2.columns = ["type", "count"]
         fig = px.treemap(counts2, path=["type"], values="count",
                          color="type", color_discrete_map=TYPE_COLORS)
-        fig.update_layout(template="plotly_white", height=360, margin=dict(l=0, r=0, t=10, b=0))
+        _style_fig(fig, height=360)
         st.plotly_chart(fig, use_container_width=True)
     with tab_scatter:
         st.caption(
@@ -275,10 +346,9 @@ def _render_overview(st, api):
                 sc, x="confidence", y="severity", color="type",
                 color_discrete_map=TYPE_COLORS, hover_data=["title"],
             )
-            fig.update_traces(marker=dict(size=12, opacity=0.75))
-            fig.update_layout(template="plotly_white", height=360,
-                              margin=dict(l=0, r=0, t=10, b=0),
-                              legend=dict(orientation="h", y=-0.25))
+            fig.update_traces(marker=dict(size=12, opacity=0.8))
+            _style_fig(fig, height=360)
+            fig.update_layout(legend=dict(orientation="h", y=-0.25))
             st.plotly_chart(fig, use_container_width=True)
 
     st.caption(
@@ -429,6 +499,7 @@ def render() -> None:
 
     st.set_page_config(page_title="AgentWatch — AI Incident Observatory", page_icon="🔭",
                        layout="wide")
+    st.markdown(_CSS, unsafe_allow_html=True)
     api = AgentWatchClient()
     page = _sidebar(st)
     st.title("AgentWatch — AI Incident Observatory")

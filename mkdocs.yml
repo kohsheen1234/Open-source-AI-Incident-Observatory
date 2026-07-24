@@ -4,20 +4,19 @@ site_url: https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/
 theme:
   name: material
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      toggle:
-        icon: material/weather-night
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      toggle:
-        icon: material/weather-sunny
-        name: Switch to light mode
+    scheme: slate
+    primary: custom
+    accent: custom
+  font:
+    text: Inter
+    code: JetBrains Mono
   features:
     - navigation.sections
     - navigation.top
     - content.code.copy
+
+extra_css:
+  - stylesheets/extra.css
 markdown_extensions:
   - admonition
   - pymdownx.highlight
