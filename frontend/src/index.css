@@ -14,29 +14,51 @@ body,
 
 body {
   margin: 0;
-  background-color: #0d0d0f;
-  color: #f2f2f3;
+  background-color: #0a0806;
+  color: #f6efe4;
   font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Ambient page texture: faint dotted grid + top gradient glows. */
+/* Cinematic, volumetric "spice" glow — warm amber/orange drifting on near-black. */
 .page-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image:
-    radial-gradient(circle at 18% -10%, rgba(62, 207, 142, 0.10), transparent 42%),
-    radial-gradient(circle at 82% -6%, rgba(34, 211, 238, 0.08), transparent 40%),
-    radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 26px 26px;
+  background:
+    radial-gradient(65% 55% at 50% -8%, rgba(245, 165, 36, 0.22), transparent 68%),
+    radial-gradient(45% 45% at 82% 2%, rgba(255, 122, 24, 0.16), transparent 66%),
+    radial-gradient(48% 48% at 12% 6%, rgba(242, 120, 47, 0.12), transparent 66%),
+    #0a0806;
+  animation: drift 22s ease-in-out infinite alternate;
+}
+@keyframes drift {
+  from {
+    transform: translateY(-10px) scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(24px) scale(1.06);
+    opacity: 1;
+  }
 }
 
-/* Gradient display text — the site's signature. */
+/* Fine film grain over everything for a cinematic texture. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Warm gradient display text — the signature. */
 .grad-text {
-  background: linear-gradient(100deg, #ffffff 0%, #baf7dc 40%, #3ecf8e 70%, #22d3ee 100%);
+  background: linear-gradient(96deg, #fff6e8 0%, #ffd27a 42%, #f5a524 70%, #ff7a18 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -45,9 +67,9 @@ body {
 
 .eyebrow {
   font-family: "JetBrains Mono", ui-monospace, monospace;
-  color: #3ecf8e;
+  color: #f5a524;
   font-size: 0.72rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
@@ -56,7 +78,7 @@ body {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #262629;
+  background: #2b241c;
   border-radius: 6px;
 }
 ::-webkit-scrollbar-track {
@@ -64,7 +86,7 @@ body {
 }
 
 a {
-  color: #3ecf8e;
+  color: #f5a524;
   text-decoration: none;
 }
 a:hover {
@@ -72,13 +94,14 @@ a:hover {
 }
 
 *:focus-visible {
-  outline: 2px solid #3ecf8e;
+  outline: 2px solid #f5a524;
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  .page-bg {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }

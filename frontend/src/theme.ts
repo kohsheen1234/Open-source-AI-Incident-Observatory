@@ -12,9 +12,9 @@ export const TYPE_COLORS: Record<string, string> = {
 };
 
 export const SEV_COLORS: Record<number, string> = {
-  1: "#3ecf8e",
-  2: "#a3d9b1",
-  3: "#f3a712",
+  1: "#f5d27a",
+  2: "#f5a524",
+  3: "#f2812f",
   4: "#e4572e",
   5: "#d7263d",
 };

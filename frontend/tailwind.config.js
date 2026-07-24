@@ -4,16 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: "#0d0d0f",
-        surface: "#141416",
-        panel: "#1a1a1d",
-        border: "#262629",
-        "border-strong": "#34343a",
-        brand: "#3ecf8e",
-        "brand-2": "#22d3ee",
-        ink: "#f2f2f3",
-        muted: "#9b9ba3",
-        faint: "#6c6c75",
+        bg: "#0a0806",
+        surface: "#14100c",
+        panel: "#1b1611",
+        border: "#2b241c",
+        "border-strong": "#3b3125",
+        brand: "#f5a524", // spice amber
+        "brand-2": "#ff7a18", // ember orange
+        ink: "#f6efe4",
+        muted: "#a89f90",
+        faint: "#6f665a",
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
@@ -21,7 +21,7 @@ export default {
       },
       maxWidth: { content: "1180px" },
       boxShadow: {
-        card: "0 1px 0 0 rgba(255,255,255,0.02) inset, 0 8px 24px -12px rgba(0,0,0,0.6)",
+        card: "0 1px 0 0 rgba(255,255,255,0.03) inset, 0 12px 40px -18px rgba(0,0,0,0.8)",
       },
     },
   },

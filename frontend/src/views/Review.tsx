@@ -129,7 +129,7 @@ export function Review() {
               />
               <button
                 onClick={submit}
-                className="mt-3 bg-brand hover:bg-brand-hover text-[#0b0f0d] font-semibold px-4 py-2 rounded-md"
+                className="mt-3 bg-brand hover:bg-[#ffbb4d] text-[#1c1206] font-semibold px-4 py-2 rounded-lg"
               >
                 Submit review
               </button>

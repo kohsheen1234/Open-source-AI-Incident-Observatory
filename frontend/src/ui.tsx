@@ -59,7 +59,7 @@ export function PrimaryButton({
   href?: string;
 }) {
   const cls =
-    "inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-[#04140c] hover:bg-[#57d99e] transition-colors no-underline";
+    "inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-[#1c1206] hover:bg-[#ffbb4d] transition-colors no-underline";
   return href ? (
     <a className={cls} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer">
       {children}

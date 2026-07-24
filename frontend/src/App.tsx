@@ -35,6 +35,7 @@ export default function App() {
   return (
     <div className="relative min-h-screen flex flex-col">
       <div className="page-bg" />
+      <div className="grain" />
 
       <header className="sticky top-0 z-30 border-b border-border bg-bg/70 backdrop-blur-xl">
         <div className="max-w-content mx-auto px-6 h-16 flex items-center justify-between">
