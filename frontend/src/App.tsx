@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { api } from "./api";
 import { GhostButton, PrimaryButton, Spinner } from "./ui";
 import { Explorer } from "./views/Explorer";
+import { Methodology } from "./views/Methodology";
 import { Overview } from "./views/Overview";
 import { Review } from "./views/Review";
 
-const VIEWS = ["Overview", "Explorer", "Review"] as const;
+const VIEWS = ["Overview", "How it works", "Explorer", "Review"] as const;
 type View = (typeof VIEWS)[number];
 
 const DOCS_URL = "https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/";
@@ -98,7 +99,10 @@ export default function App() {
             <PrimaryButton onClick={waitForApi}>Retry</PrimaryButton>
           </div>
         )}
-        {ready === true && view === "Overview" && <Overview onExplore={() => setView("Explorer")} />}
+        {ready === true && view === "Overview" && (
+          <Overview onExplore={() => setView("Explorer")} onHowItWorks={() => setView("How it works")} />
+        )}
+        {ready === true && view === "How it works" && <Methodology />}
         {ready === true && view === "Explorer" && <Explorer />}
         {ready === true && view === "Review" && <Review />}
       </main>

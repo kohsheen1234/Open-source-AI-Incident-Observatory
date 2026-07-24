@@ -16,7 +16,13 @@ const PIPELINE = [
 
 const TABS = ["Over time", "Severity", "Confidence × severity"] as const;
 
-export function Overview({ onExplore }: { onExplore?: () => void }) {
+export function Overview({
+  onExplore,
+  onHowItWorks,
+}: {
+  onExplore?: () => void;
+  onHowItWorks?: () => void;
+}) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [page, setPage] = useState<Page | null>(null);
   const [tab, setTab] = useState<(typeof TABS)[number]>("Over time");
@@ -115,6 +121,11 @@ export function Overview({ onExplore }: { onExplore?: () => void }) {
             </div>
           ))}
         </div>
+        {onHowItWorks && (
+          <button onClick={onHowItWorks} className="text-brand text-sm mt-6 hover:underline">
+            Read the full methodology — sources, formats, transformations, and limits →
+          </button>
+        )}
       </div>
 
       {/* Charts */}
