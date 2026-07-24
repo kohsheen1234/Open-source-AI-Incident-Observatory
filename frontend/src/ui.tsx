@@ -2,22 +2,24 @@ import type { ReactNode } from "react";
 import { sevColor, typeColor } from "./theme";
 
 export function Eyebrow({ children }: { children: ReactNode }) {
-  return (
-    <div className="font-mono text-brand text-xs uppercase tracking-[0.14em] mb-3">{children}</div>
-  );
+  return <div className="eyebrow mb-3">{children}</div>;
 }
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`bg-surface border border-border rounded-xl ${className}`}>{children}</div>
+    <div
+      className={`bg-surface border border-border rounded-2xl shadow-card transition-colors hover:border-border-strong ${className}`}
+    >
+      {children}
+    </div>
   );
 }
 
 export function StatCard({ label, value, hint }: { label: string; value: ReactNode; hint?: string }) {
   return (
-    <Card className="p-4">
-      <div className="font-mono text-[0.7rem] uppercase tracking-wider text-muted">{label}</div>
-      <div className="text-3xl font-bold text-ink mt-1">{value}</div>
+    <Card className="p-5">
+      <div className="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-faint">{label}</div>
+      <div className="text-3xl font-bold text-ink mt-2 tabular-nums">{value}</div>
       {hint && <div className="text-xs text-muted mt-1">{hint}</div>}
     </Card>
   );
@@ -40,19 +42,62 @@ export function TypeBadge({ type }: { type: string | null }) {
 
 export function SeverityChip({ severity }: { severity: number | null }) {
   return (
-    <Pill text={severity == null ? "severity —" : `severity ${severity}/5`} color={sevColor(severity)} />
+    <Pill
+      text={severity == null ? "severity —" : `severity ${severity}/5`}
+      color={sevColor(severity)}
+    />
+  );
+}
+
+export function PrimaryButton({
+  children,
+  onClick,
+  href,
+}: {
+  children: ReactNode;
+  onClick?: () => void;
+  href?: string;
+}) {
+  const cls =
+    "inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-[#04140c] hover:bg-[#57d99e] transition-colors no-underline";
+  return href ? (
+    <a className={cls} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer">
+      {children}
+    </a>
+  ) : (
+    <button className={cls} onClick={onClick}>
+      {children}
+    </button>
+  );
+}
+
+export function GhostButton({ children, href }: { children: ReactNode; href: string }) {
+  return (
+    <a
+      className="inline-flex items-center gap-1.5 rounded-lg border border-border-strong px-4 py-2 text-sm font-medium text-ink hover:border-brand hover:text-brand transition-colors no-underline"
+      href={href}
+      target={href.startsWith("http") ? "_blank" : undefined}
+      rel="noreferrer"
+    >
+      {children}
+    </a>
   );
 }
 
 export function Spinner({ label }: { label: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+    <div className="flex flex-col items-center justify-center gap-4 py-28 text-center">
       <div className="h-10 w-10 rounded-full border-2 border-border border-t-brand animate-spin" />
       <p className="text-muted max-w-md">{label}</p>
     </div>
   );
 }
 
-export function SectionTitle({ children }: { children: ReactNode }) {
-  return <h2 className="text-xl font-bold text-ink tracking-tight mb-3">{children}</h2>;
+export function SectionHeader({ eyebrow, title }: { eyebrow?: string; title: string }) {
+  return (
+    <div className="mb-4">
+      {eyebrow && <div className="eyebrow mb-1.5">{eyebrow}</div>}
+      <h2 className="text-2xl font-bold text-ink tracking-tight">{title}</h2>
+    </div>
+  );
 }

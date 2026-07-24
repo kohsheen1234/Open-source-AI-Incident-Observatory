@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import { INCIDENT_TYPES, cleanText } from "../theme";
 import type { IncidentDetail, Page } from "../types";
-import { Card, SectionTitle, SeverityChip, TypeBadge } from "../ui";
+import { Card, SectionHeader, SeverityChip, TypeBadge } from "../ui";
 
 export function Explorer() {
   const [page, setPage] = useState<Page | null>(null);
@@ -32,8 +32,8 @@ export function Explorer() {
 
   return (
     <div>
-      <SectionTitle>Incident Explorer</SectionTitle>
-      <p className="text-muted mb-5">
+      <SectionHeader eyebrow="Browse" title="Incident Explorer" />
+      <p className="text-muted mb-5 -mt-2">
         Browse and filter every collected incident. <span className="text-ink">Each row is a real
         public post.</span>
       </p>

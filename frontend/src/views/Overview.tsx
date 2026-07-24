@@ -3,7 +3,9 @@ import { api } from "../api";
 import { ConfidenceScatter, SeverityBar, SourceDonut, TimeArea, TypeBar } from "../charts";
 import { INCIDENT_TYPES } from "../theme";
 import type { Page, Stats } from "../types";
-import { Card, Eyebrow, SectionTitle, StatCard } from "../ui";
+import { Card, GhostButton, PrimaryButton, SectionHeader, StatCard } from "../ui";
+
+const DOCS_URL = "https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/";
 
 const PIPELINE = [
   ["📥", "Collect", "Public posts pulled from Hacker News (live search API), Reddit (optional), and a bundled sample set."],
@@ -14,7 +16,7 @@ const PIPELINE = [
 
 const TABS = ["Over time", "Severity", "Confidence × severity"] as const;
 
-export function Overview() {
+export function Overview({ onExplore }: { onExplore?: () => void }) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [page, setPage] = useState<Page | null>(null);
   const [tab, setTab] = useState<(typeof TABS)[number]>("Over time");
@@ -62,32 +64,27 @@ export function Overview() {
 
   return (
     <div>
-      <div className="relative hero-glow">
-        <Eyebrow>Live · AI-agent incident monitoring</Eyebrow>
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-          AI Incident Observatory
+      {/* Hero */}
+      <section className="text-center max-w-3xl mx-auto pt-6 pb-4">
+        <div className="eyebrow mb-4">Live · AI-agent incident monitoring</div>
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.05]">
+          <span className="grad-text">The observatory for</span>
+          <br />
+          <span className="text-ink">AI-agent incidents</span>
         </h1>
-        <p className="text-muted max-w-3xl mt-4 leading-relaxed">
-          As AI systems increasingly <span className="text-ink font-medium">act on their own</span> —
-          running tools, taking actions, operating autonomously — people post about what happens when
-          they misbehave. <span className="text-ink font-medium">AgentWatch turns those scattered,
-          disappearing reports into a durable, measurable evidence base</span>, so researchers and
-          safety teams can track how often incidents happen, what kinds occur, and how the picture
-          changes over time.
+        <p className="text-muted text-lg leading-relaxed mt-6">
+          As AI systems increasingly act on their own, people post when they misbehave — deleting
+          files, ignoring instructions, acting without permission. AgentWatch turns those scattered,
+          disappearing reports into a durable, measurable evidence base.
         </p>
-      </div>
+        <div className="flex flex-wrap gap-3 justify-center mt-8">
+          <PrimaryButton onClick={onExplore}>Explore incidents →</PrimaryButton>
+          <GhostButton href={DOCS_URL}>Read the docs</GhostButton>
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
-        {PIPELINE.map(([emoji, title, body]) => (
-          <Card key={title} className="p-5">
-            <div className="text-2xl">{emoji}</div>
-            <div className="font-semibold text-ink mt-2">{title}</div>
-            <div className="text-sm text-muted mt-1 leading-relaxed">{body}</div>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-8">
+      {/* KPI strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-10">
         <StatCard label="Incidents" value={stats?.total_incidents ?? "…"} hint="collected" />
         <StatCard label="Classified" value={stats?.total_classified ?? "…"} hint="labelled" />
         <StatCard
@@ -99,36 +96,49 @@ export function Overview() {
         <StatCard label="Avg severity" value={agg.avgSev} hint="scale 1–5" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-10">
-        <div className="lg:col-span-3">
-          <SectionTitle>Incidents by type</SectionTitle>
-          <Card className="p-4">
-            {agg.type.length ? <TypeBar data={agg.type} /> : <Empty />}
-          </Card>
-        </div>
-        <div className="lg:col-span-2">
-          <SectionTitle>By source</SectionTitle>
-          <Card className="p-4">{agg.source.length ? <SourceDonut data={agg.source} /> : <Empty />}</Card>
+      {/* Pipeline */}
+      <div className="mt-16">
+        <SectionHeader eyebrow="How it works" title="From scattered posts to measurable evidence" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {PIPELINE.map(([emoji, title, body], i) => (
+            <Card key={title} className="p-5 relative">
+              <div className="font-mono text-xs text-faint">0{i + 1}</div>
+              <div className="text-2xl mt-2">{emoji}</div>
+              <div className="font-semibold text-ink mt-2">{title}</div>
+              <div className="text-sm text-muted mt-1.5 leading-relaxed">{body}</div>
+            </Card>
+          ))}
         </div>
       </div>
 
-      <div className="mt-10">
-        <div className="flex gap-2 mb-3">
+      {/* Charts */}
+      <div className="mt-16">
+        <SectionHeader eyebrow="Breakdown" title="What kinds of incidents, and from where" />
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <Card className="lg:col-span-3 p-5">
+            <h3 className="font-semibold text-ink mb-3">Incidents by type</h3>
+            {agg.type.length ? <TypeBar data={agg.type} /> : <Empty />}
+          </Card>
+          <Card className="lg:col-span-2 p-5">
+            <h3 className="font-semibold text-ink mb-3">By source</h3>
+            {agg.source.length ? <SourceDonut data={agg.source} /> : <Empty />}
+          </Card>
+        </div>
+
+        <div className="flex gap-2 mt-6 mb-3">
           {TABS.map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`font-mono text-xs uppercase tracking-wider px-3 py-1.5 rounded-md border ${
-                tab === t
-                  ? "border-brand text-brand bg-brand/10"
-                  : "border-border text-muted hover:text-ink"
+              className={`font-mono text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-colors ${
+                tab === t ? "border-brand text-brand bg-brand/10" : "border-border text-muted hover:text-ink"
               }`}
             >
               {t}
             </button>
           ))}
         </div>
-        <Card className="p-4">
+        <Card className="p-5">
           {tab === "Over time" && (agg.time.length ? <TimeArea data={agg.time} /> : <Empty />)}
           {tab === "Severity" && (agg.severity.length ? <SeverityBar data={agg.severity} /> : <Empty />)}
           {tab === "Confidence × severity" &&
@@ -136,7 +146,7 @@ export function Overview() {
         </Card>
       </div>
 
-      <details className="mt-10 border border-border rounded-xl bg-surface p-4">
+      <details className="mt-10 border border-border rounded-2xl bg-surface p-5">
         <summary className="cursor-pointer font-semibold text-ink">What do the incident types mean?</summary>
         <ul className="mt-3 space-y-1.5 text-sm text-muted">
           {Object.entries(INCIDENT_TYPES).map(([name, desc]) => (
@@ -147,7 +157,7 @@ export function Overview() {
         </ul>
       </details>
 
-      <p className="text-xs text-muted mt-6">
+      <p className="text-xs text-faint mt-6">
         Data collected from Hacker News (live) + a bundled sample set, classified by the baseline
         classifier. Classifications are automated and unverified until reviewed.
       </p>

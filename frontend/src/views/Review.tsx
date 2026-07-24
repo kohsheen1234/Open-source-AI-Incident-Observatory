@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { cleanText } from "../theme";
 import type { IncidentDetail, Page } from "../types";
-import { Card, Pill, SectionTitle, SeverityChip, TypeBadge } from "../ui";
+import { Card, Pill, SectionHeader, SeverityChip, TypeBadge } from "../ui";
 
 const DECISIONS = ["accept", "override", "false_positive"] as const;
 
@@ -45,8 +45,8 @@ export function Review() {
 
   return (
     <div>
-      <SectionTitle>Review Queue</SectionTitle>
-      <p className="text-muted mb-5 max-w-3xl">
+      <SectionHeader eyebrow="Human-in-the-loop" title="Review Queue" />
+      <p className="text-muted mb-5 max-w-3xl -mt-2">
         Human-in-the-loop review. The classifier's label is a machine <span className="text-ink">opinion</span>;
         here a person <span className="text-ink">accepts</span>, <span className="text-ink">overrides</span>, or flags
         it as a <span className="text-ink">false positive</span>. Both are kept, so the classifier's accuracy can be
