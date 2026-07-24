@@ -120,7 +120,7 @@ same evaluation runs against any of them.
 
 ## The web layer
 
-Stored, classified incidents are exposed through a FastAPI service, and a Streamlit
+Stored, classified incidents are exposed through a FastAPI service, and a React (Vite + TypeScript + Tailwind)
 dashboard consumes that API. See [API & dashboard](api.md).
 
 ```text
@@ -135,7 +135,7 @@ dashboard consumes that API. See [API & dashboard](api.md).
         ▲
         │ HTTP (AgentWatchClient)
         │
-  Streamlit dashboard (dashboard/app.py)
+  React single-page app (frontend/, Vite + TypeScript + Tailwind)
    Overview · Incident Explorer · Review Queue
 ```
 

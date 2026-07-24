@@ -1,6 +1,6 @@
 # API & dashboard
 
-AgentWatch exposes its incidents through a documented HTTP API, and ships a Streamlit
+AgentWatch exposes its incidents through a documented HTTP API, and ships a React (Vite + TypeScript + Tailwind)
 dashboard that consumes that API. The dashboard never touches the database directly —
 everything goes through the same API an external consumer would use.
 
@@ -86,10 +86,14 @@ writes down by setting the key.
 
 ## The dashboard
 
+The dashboard is a **React single-page app** (Vite + TypeScript + Tailwind, Recharts)
+in `frontend/`, deployed as a static site and served locally by Caddy in the compose
+stack. To run just the frontend against a local API:
+
 ```bash
-pip install -e ".[dashboard]"
-agentwatch serve                       # in one terminal
-AGENTWATCH_API_URL=http://localhost:8000 streamlit run dashboard/app.py
+agentwatch serve                                 # API on :8000, in one terminal
+cd frontend && npm install
+VITE_API_URL=http://localhost:8000 npm run dev   # web on :5173, in another
 ```
 
 Three pages:

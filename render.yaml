@@ -1,4 +1,4 @@
-# Render blueprint — one-click deploy of the AgentWatch API + dashboard + Postgres.
+# Render blueprint — one-click deploy of the AgentWatch API + web app + Postgres.
 # Use the "Deploy to Render" button in the README, or run `render blueprint launch`.
 databases:
   - name: agentwatch-db
@@ -21,14 +21,17 @@ services:
         value: production
 
   - type: web
-    name: agentwatch-dashboard
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
-    plan: free
-    dockerCommand: /app/scripts/render-dashboard.sh
+    name: agentwatch-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
-      - key: AGENTWATCH_API_URL
+      - key: VITE_API_URL
         fromService:
           type: web
           name: agentwatch-api

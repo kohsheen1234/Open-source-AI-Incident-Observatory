@@ -81,6 +81,13 @@ def test_health_and_list_and_review_and_csv(monkeypatch, tmp_path):
     assert "destructive_action" in csv_resp.text
 
 
+def test_cors_header_present(monkeypatch, tmp_path):
+    _seed(monkeypatch, tmp_path)
+    client = TestClient(create_app())
+    r = client.get("/stats", headers={"Origin": "https://example.com"})
+    assert r.headers.get("access-control-allow-origin") == "*"
+
+
 def test_missing_incident_returns_404(monkeypatch, tmp_path):
     _seed(monkeypatch, tmp_path)
     client = TestClient(create_app())

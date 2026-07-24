@@ -10,7 +10,7 @@
 
 | | |
 |---|---|
-| 🖥️ **Dashboard** | <https://agentwatch-dashboard-zner.onrender.com> |
+| 🖥️ **Dashboard** | <https://agentwatch-web.onrender.com> |
 | 📡 **API docs** | <https://agentwatch-api-7mhz.onrender.com/docs> |
 | 📖 **Documentation** | <https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/> |
 
@@ -112,7 +112,7 @@ complete and tested — provides:
 | **Abstain-capable taxonomy** | Ten incident types plus an explicit *insufficient_evidence* outcome, so the system distinguishes "no incident" from "not enough evidence". |
 | **Measured quality** | A labelled evaluation set with precision / recall / macro-F1 / confusion matrix / abstention rate, and a regression test that fails if macro-F1 drops below a committed floor. |
 | **Documented HTTP API** | A FastAPI service (list / filter / detail / review / stats / CSV export) with auto-generated OpenAPI docs and optional API-key auth on writes. |
-| **Review dashboard** | A Streamlit app (overview, incident explorer, review queue) that consumes the API — reviewers accept, override, or flag classifications. |
+| **Review dashboard** | A React single-page app (overview, incident explorer, review queue) that consumes the API — reviewers accept, override, or flag classifications. |
 | **Metrics & dashboards** | The API exposes Prometheus metrics; Prometheus scrapes them and a provisioned Grafana dashboard visualises incidents, classifications, abstention rate, and collection-run health. |
 | **One-command stack** | `docker compose up` brings up db, API, dashboard, Prometheus, Grafana, and a Caddy reverse proxy (auto-HTTPS in production) on one network. |
 | **Test suite** | Every component is covered by tests that run in under a second. |
@@ -260,21 +260,23 @@ Reads are public. If `AGENTWATCH_API_KEY` is set, writes (review) and CSV export
 require an `X-API-Key` header — so a reviewer can run it locally with zero config,
 while production can lock it down.
 
-## The dashboard
+## The web dashboard
 
-The Streamlit dashboard consumes the API (it never touches the database directly):
+The dashboard is a **React single-page app** (Vite + TypeScript + Tailwind, charts with
+Recharts) in [`frontend/`](frontend/). It only ever talks to the HTTP API. Run it locally:
 
 ```bash
-# In one terminal: run the API
-agentwatch serve
-# In another: run the dashboard (install the extra first)
-pip install -e ".[dashboard]"
-AGENTWATCH_API_URL=http://localhost:8000 streamlit run dashboard/app.py
+cd frontend
+npm install
+VITE_API_URL=http://localhost:8000 npm run dev   # dev server on http://localhost:5173
 ```
 
-Pages: **Overview** (headline metrics + incidents-by-type chart), **Incident Explorer**
-(filterable table), and **Review Queue** (open an incident, see its evidence and
-classification, and submit a review).
+The whole stack (API + web behind Caddy) also comes up with `make up` — see
+[Run the whole system](#run-the-whole-system).
+
+Pages: **Overview** (mission, pipeline, KPIs, and interactive charts), **Incident
+Explorer** (filterable table with colored type/severity badges and per-incident evidence),
+and **Review Queue** (accept / override / flag a classification).
 
 ## Configuration
 
@@ -291,11 +293,13 @@ All configuration is read from environment variables prefixed `AGENTWATCH_`
 | `AGENTWATCH_REDDIT_CLIENT_ID` | _(unset)_ | Enables the opt-in Reddit source |
 | `AGENTWATCH_REDDIT_CLIENT_SECRET` | _(unset)_ | Enables the opt-in Reddit source |
 | `AGENTWATCH_API_KEY` | _(unset)_ | If set, required (`X-API-Key`) for API writes and export |
-| `AGENTWATCH_API_URL` | `http://localhost:8000` | API base URL the dashboard talks to |
+
+The web app is configured at build time with `VITE_API_URL` (the API base URL it calls).
 
 ## Tech stack
 
-Python 3.12 · SQLAlchemy 2.0 · Alembic · Pydantic · FastAPI · uvicorn · Streamlit ·
+Python 3.12 · SQLAlchemy 2.0 · Alembic · Pydantic · FastAPI · uvicorn ·
+React + Vite + TypeScript + Tailwind + Recharts (frontend) ·
 httpx · tenacity · APScheduler · structlog · PostgreSQL 16 · Docker Compose ·
 pytest · ruff.
 
@@ -344,7 +348,7 @@ agentwatch/        # the package
   cli.py           # `agentwatch` command-line interface
   scheduler.py     # APScheduler-based recurring collection
   db/              # SQLAlchemy models, base, portable types, session management
-dashboard/         # Streamlit dashboard + API client
+frontend/          # React + Vite + TypeScript + Tailwind single-page app (the web UI)
 migrations/        # Alembic migration environment and versions
 deploy/            # docker-compose service definitions
 docs/              # MkDocs documentation site

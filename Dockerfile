@@ -5,13 +5,11 @@ WORKDIR /app
 
 COPY pyproject.toml README.md ./
 COPY agentwatch ./agentwatch
-COPY dashboard ./dashboard
 COPY migrations ./migrations
 COPY alembic.ini ./
 COPY scripts ./scripts
-COPY .streamlit ./.streamlit
 
-RUN pip install --upgrade pip && pip install ".[dashboard]" && chmod +x scripts/*.sh
+RUN pip install --upgrade pip && pip install "." && chmod +x scripts/*.sh
 
 # Default command is the API entrypoint (migrate + serve). Compose / Render override
 # with a single-token script path per service so no shell quoting is involved.

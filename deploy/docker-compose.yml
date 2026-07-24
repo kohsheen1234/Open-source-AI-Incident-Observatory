@@ -31,12 +31,11 @@ services:
       db:
         condition: service_healthy
 
-  dashboard:
-    build: ..
-    command: ["/app/scripts/render-dashboard.sh"]
-    environment:
-      AGENTWATCH_API_URL: http://api:8000
-      PORT: "8501"
+  web:
+    build:
+      context: ../frontend
+      args:
+        VITE_API_URL: /api
     depends_on:
       - api
 
@@ -65,7 +64,7 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
     depends_on:
-      - dashboard
+      - web
       - api
       - grafana
 

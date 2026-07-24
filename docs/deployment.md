@@ -15,7 +15,7 @@ This builds the application image and starts six services on one network:
 |---|---|---|
 | **db** | PostgreSQL 16 | host `localhost:5433` (internal `db:5432`) |
 | **api** | FastAPI (runs `alembic upgrade head` on start, then serves) | via Caddy at `/api` |
-| **dashboard** | Streamlit review UI | via Caddy at `/` |
+| **dashboard** | React SPA review UI | via Caddy at `/` |
 | **prometheus** | Scrapes `api:8000/metrics` every 15s | internal |
 | **grafana** | Provisioned dashboard + Prometheus datasource | via Caddy at `/grafana` (anonymous view enabled) |
 | **caddy** | Reverse proxy (auto-HTTPS in production) | `http://localhost:8080` |
@@ -82,7 +82,7 @@ Then classify with `--provider ollama` (point the app at `http://ollama:11434` v
    observatory.example.org {
        handle_path /api/* { reverse_proxy api:8000 }
        handle_path /grafana/* { reverse_proxy grafana:3000 }
-       handle { reverse_proxy dashboard:8501 }
+       handle { reverse_proxy web:80 }
    }
    ```
    Caddy obtains and renews Let's Encrypt certificates automatically — no extra config.

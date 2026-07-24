@@ -18,7 +18,7 @@ searchable, and analysable record.
     ingestion pipeline (pluggable collectors, evidence storage, normalisation,
     scheduled collection), the classification + evaluation layer (pluggable
     abstain-capable classifier, labelled eval set, regression gate), the web layer
-    (documented authenticated HTTP API + Streamlit review dashboard), and observability
+    (documented authenticated HTTP API + React SPA review dashboard), and observability
     + deployment (Prometheus metrics, a provisioned Grafana dashboard, and a one-command
     `docker compose` stack behind Caddy). Nothing here is aspirational.
 

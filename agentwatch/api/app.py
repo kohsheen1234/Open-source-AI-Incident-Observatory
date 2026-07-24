@@ -1,4 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 
 from agentwatch.api import queries
 from agentwatch.api.auth import require_api_key
@@ -59,6 +60,14 @@ def create_app() -> FastAPI:
         title="AgentWatch API",
         version="0.1.0",
         root_path=get_settings().api_root_path,
+    )
+    # Allow the browser SPA (served from a different origin) to call the API. Reads are
+    # public; write routes remain gated by the optional API key.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     @app.get("/health")
