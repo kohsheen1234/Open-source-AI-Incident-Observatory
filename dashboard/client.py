@@ -21,6 +21,24 @@ class AgentWatchClient:
     def _headers(self) -> dict:
         return {"X-API-Key": self.api_key} if self.api_key else {}
 
+    def health(self) -> bool:
+        """True if the API is up. Swallows errors so callers can poll during cold start."""
+        try:
+            resp = self._client.get("/health")
+            return resp.status_code == 200 and resp.json().get("status") == "ok"
+        except Exception:
+            return False
+
+    def wait_until_ready(self, timeout: float = 75.0, interval: float = 3.0) -> bool:
+        """Poll /health until the API responds or the timeout elapses (covers cold starts)."""
+        waited = 0.0
+        while waited < timeout:
+            if self.health():
+                return True
+            time.sleep(interval)
+            waited += interval
+        return self.health()
+
     def _get_json(self, path: str, params: dict | None = None, *, attempts: int = 3):
         last: Exception | None = None
         for i in range(attempts):

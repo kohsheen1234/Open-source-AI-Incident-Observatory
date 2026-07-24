@@ -53,6 +53,40 @@ TYPE_COLORS = {
     "insufficient_evidence": "#c9ced6",
 }
 
+# Severity 1 (minor) → 5 (critical).
+SEV_COLORS = {1: "#5b8c5a", 2: "#a3b18a", 3: "#f3a712", 4: "#e4572e", 5: "#d7263d"}
+
+
+def _clean_text(s: str | None) -> str:
+    """Strip HTML tags/entities from source text (e.g. Hacker News) for display."""
+    import html as _html
+    import re
+
+    if not s:
+        return ""
+    s = re.sub(r"<[^>]+>", " ", s)
+    return re.sub(r"\s+", " ", _html.unescape(s)).strip()
+
+
+def _pill(text: str, color: str) -> str:
+    return (
+        f'<span style="background:{color};color:#fff;padding:2px 10px;border-radius:12px;'
+        f'font-size:0.82em;font-weight:600;white-space:nowrap;">{text}</span>'
+    )
+
+
+def _type_badge(itype: str | None) -> str:
+    if not itype:
+        return _pill("unclassified", "#9aa5b1")
+    return _pill(itype, TYPE_COLORS.get(itype, "#6c757d"))
+
+
+def _severity_chip(sev) -> str:
+    if sev is None or (isinstance(sev, float) and sev != sev):  # None / NaN
+        return _pill("severity —", "#9aa5b1")
+    sev = int(sev)
+    return _pill(f"severity {sev}/5", SEV_COLORS.get(sev, "#6c757d"))
+
 
 # ----------------------------------------------------------------------------- data
 
@@ -180,8 +214,8 @@ def _render_overview(st, api):
         )
         st.plotly_chart(fig, use_container_width=True)
 
-    tab_time, tab_sev, tab_conf = st.tabs(
-        ["📈 Over time", "🔥 Severity", "🎯 Confidence"]
+    tab_time, tab_sev, tab_conf, tab_mix, tab_scatter = st.tabs(
+        ["📈 Over time", "🔥 Severity", "🎯 Confidence", "🌳 Type mix", "⚖️ Confidence × severity"]
     )
     with tab_time:
         st.caption("When the underlying posts were published.")
@@ -220,6 +254,32 @@ def _render_overview(st, api):
             fig.update_layout(template="plotly_white", height=320,
                               margin=dict(l=0, r=0, t=10, b=0), yaxis_title="incidents")
             st.plotly_chart(fig, use_container_width=True)
+    with tab_mix:
+        st.caption("The relative mix of incident types — area is proportional to count.")
+        counts2 = df["type"].value_counts().reset_index()
+        counts2.columns = ["type", "count"]
+        fig = px.treemap(counts2, path=["type"], values="count",
+                         color="type", color_discrete_map=TYPE_COLORS)
+        fig.update_layout(template="plotly_white", height=360, margin=dict(l=0, r=0, t=10, b=0))
+        st.plotly_chart(fig, use_container_width=True)
+    with tab_scatter:
+        st.caption(
+            "Each dot is an incident. Bottom-left (low confidence, high severity) is where "
+            "human review matters most."
+        )
+        sc = df.dropna(subset=["severity", "confidence"])
+        if sc.empty:
+            st.info("Not enough classified data yet.")
+        else:
+            fig = px.scatter(
+                sc, x="confidence", y="severity", color="type",
+                color_discrete_map=TYPE_COLORS, hover_data=["title"],
+            )
+            fig.update_traces(marker=dict(size=12, opacity=0.75))
+            fig.update_layout(template="plotly_white", height=360,
+                              margin=dict(l=0, r=0, t=10, b=0),
+                              legend=dict(orientation="h", y=-0.25))
+            st.plotly_chart(fig, use_container_width=True)
 
     st.caption(
         f"Charts based on the latest {len(df)} of {total} incidents · "
@@ -228,15 +288,56 @@ def _render_overview(st, api):
     _glossary(st)
 
 
-def _classification_caption(cls: dict) -> str:
+def _styled_table(st, view):
+    if view.empty:
+        st.info("No incidents match the current filters.")
+        return
+    disp = view[["id", "type", "severity", "confidence", "source", "title", "url"]].copy()
+
+    def _sty_type(v):
+        c = TYPE_COLORS.get(v, "")
+        return f"background-color:{c};color:white" if c else ""
+
+    def _sty_sev(v):
+        try:
+            c = SEV_COLORS.get(int(v), "")
+        except (TypeError, ValueError):
+            c = ""
+        return f"background-color:{c};color:white" if c else ""
+
+    styler = disp.style.map(_sty_type, subset=["type"]).map(_sty_sev, subset=["severity"])
+    st.dataframe(
+        styler,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "confidence": st.column_config.ProgressColumn(
+                "confidence", min_value=0.0, max_value=1.0, format="%.2f"
+            ),
+            "severity": st.column_config.NumberColumn("severity", format="%d"),
+            "url": st.column_config.LinkColumn("link", display_text="open ↗"),
+            "title": st.column_config.TextColumn("title", width="large"),
+        },
+    )
+
+
+def _classification_badges(st, cls: dict) -> None:
     if not cls:
-        return "Not yet classified."
+        st.markdown(_pill("unclassified", "#9aa5b1"), unsafe_allow_html=True)
+        return
     conf = cls.get("confidence")
     conf_s = f"{conf:.0%}" if isinstance(conf, (int, float)) else "—"
-    return (
-        f"**{cls.get('incident_type')}** · severity {cls.get('severity') or '—'} · "
-        f"confidence {conf_s} · model `{cls.get('model_name')}`"
+    badges = " &nbsp; ".join(
+        [
+            _type_badge(cls.get("incident_type")),
+            _severity_chip(cls.get("severity")),
+            _pill(f"confidence {conf_s}", "#3f88c5"),
+            _pill(f"model {cls.get('model_name', '—')}", "#495057"),
+        ]
     )
+    if cls.get("abstained"):
+        badges += " &nbsp; " + _pill("abstained", "#6c757d")
+    st.markdown(badges, unsafe_allow_html=True)
 
 
 def _render_explorer(st, api):
@@ -261,12 +362,7 @@ def _render_explorer(st, api):
         view = df
 
     st.caption(f"Showing {len(view)} of {total} incidents.")
-    st.dataframe(
-        view,
-        use_container_width=True,
-        hide_index=True,
-        column_config=None,
-    )
+    _styled_table(st, view)
 
     st.markdown("### 🔎 Inspect an incident")
     st.caption("See the original evidence and why it was classified.")
@@ -282,11 +378,11 @@ def _show_detail(st, api, incident_id: int):
     if detail.get("url"):
         st.markdown(f"[View original post ↗]({detail['url']})")
     cls = detail.get("classification") or {}
-    st.markdown(_classification_caption(cls))
+    _classification_badges(st, cls)
     if cls.get("reasoning_summary"):
         st.info(f"Classifier reasoning: {cls['reasoning_summary']}")
     with st.expander("Evidence (original text)"):
-        st.write(detail.get("body") or "(no body text)")
+        st.write(_clean_text(detail.get("body")) or "(no body text)")
 
 
 def _render_review(st, api):
@@ -308,11 +404,11 @@ def _render_review(st, api):
     st.markdown("#### Evidence")
     if detail.get("url"):
         st.markdown(f"[View original post ↗]({detail['url']})")
-    st.write(detail.get("body") or "(no body text)")
+    st.write(_clean_text(detail.get("body")) or "(no body text)")
 
     st.markdown("#### Machine classification")
     cls = detail.get("classification") or {}
-    st.markdown(_classification_caption(cls))
+    _classification_badges(st, cls)
     if cls.get("reasoning_summary"):
         st.info(f"Classifier reasoning: {cls['reasoning_summary']}")
 
@@ -337,6 +433,23 @@ def render() -> None:
     page = _sidebar(st)
     st.title("AgentWatch — AI Incident Observatory")
 
+    # Both the dashboard and API sleep on Render's free tier. On the first load after
+    # idle, patiently wait (with a spinner) for the API to wake instead of erroring out.
+    with st.spinner(
+        "Connecting to the API… first load after idle can take up to ~60s while "
+        "Render's free tier wakes the service. Thanks for your patience!"
+    ):
+        ready = api.wait_until_ready(timeout=75)
+
+    if not ready:
+        st.warning(
+            "⏳ The API is still waking up (Render free-tier cold start). It should be "
+            "ready in a few more seconds — please retry."
+        )
+        if st.button("Retry"):
+            st.rerun()
+        return
+
     try:
         if page == "Overview":
             _render_overview(st, api)
@@ -345,11 +458,7 @@ def render() -> None:
         elif page == "Review Queue":
             _render_review(st, api)
     except APIUnavailable:
-        st.warning(
-            "⏳ The API isn't responding yet. This demo runs on Render's free tier, where "
-            "services sleep after ~15 minutes idle and take 30–60s to wake. Give it a "
-            "moment and retry."
-        )
+        st.warning("⏳ The API stopped responding mid-request. Please retry.")
         if st.button("Retry"):
             st.rerun()
 
