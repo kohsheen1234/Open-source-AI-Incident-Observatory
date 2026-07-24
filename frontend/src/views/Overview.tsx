@@ -8,10 +8,10 @@ import { Card, GhostButton, PrimaryButton, SectionHeader, StatCard } from "../ui
 const DOCS_URL = "https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/";
 
 const PIPELINE = [
-  ["📥", "Collect", "Public posts pulled from Hacker News (live search API), Reddit (optional), and a bundled sample set."],
-  ["🔒", "Preserve", "Each post is stored verbatim with a SHA-256 hash, so evidence survives even if the original is deleted."],
-  ["🧭", "Classify", "An LLM/baseline classifier labels the incident type, severity, and confidence — and abstains when unsure."],
-  ["✅", "Review", "Machine labels are opinions; a human can accept, override, or reject them. Both are kept."],
+  ["01", "Collect", "Public posts pulled from Hacker News (live search API), Reddit (optional), and a bundled sample set."],
+  ["02", "Preserve", "Each post is stored verbatim with a SHA-256 hash, so evidence survives even if the original is deleted."],
+  ["03", "Classify", "An LLM/baseline classifier labels the incident type, severity, and confidence — and abstains when unsure."],
+  ["04", "Review", "Machine labels are opinions; a human can accept, override, or reject them. Both are kept."],
 ];
 
 const TABS = ["Over time", "Severity", "Confidence × severity"] as const;
@@ -73,9 +73,11 @@ export function Overview({ onExplore }: { onExplore?: () => void }) {
           <span className="text-ink">AI-agent incidents</span>
         </h1>
         <p className="text-muted text-lg leading-relaxed mt-7 max-w-2xl mx-auto">
-          As AI systems increasingly act on their own, people post when they misbehave — deleting
-          files, ignoring instructions, acting without permission. AgentWatch turns those scattered,
-          disappearing reports into a durable, measurable evidence base.
+          As AI systems increasingly act on their own, people post when they{" "}
+          <span className="font-serif italic text-ink">misbehave</span> — deleting files, ignoring
+          instructions, acting without permission. AgentWatch turns those scattered, disappearing
+          reports into a durable, <span className="font-serif italic text-ink">measurable</span>{" "}
+          evidence base.
         </p>
         <div className="flex flex-wrap gap-3 justify-center mt-8">
           <PrimaryButton onClick={onExplore}>Explore incidents →</PrimaryButton>
@@ -96,17 +98,23 @@ export function Overview({ onExplore }: { onExplore?: () => void }) {
         <StatCard label="Avg severity" value={agg.avgSev} hint="scale 1–5" />
       </div>
 
-      {/* Pipeline */}
-      <div className="mt-16">
+      {/* Pipeline — editorial, hairline-divided steps */}
+      <div className="mt-24">
         <SectionHeader eyebrow="How it works" title="From scattered posts to measurable evidence" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {PIPELINE.map(([emoji, title, body], i) => (
-            <Card key={title} className="p-5 relative">
-              <div className="font-mono text-xs text-faint">0{i + 1}</div>
-              <div className="text-2xl mt-2">{emoji}</div>
-              <div className="font-semibold text-ink mt-2">{title}</div>
-              <div className="text-sm text-muted mt-1.5 leading-relaxed">{body}</div>
-            </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-t border-border mt-4">
+          {PIPELINE.map(([num, title, body], i) => (
+            <div
+              key={title}
+              className={`py-7 lg:pr-7 border-b border-border lg:border-b-0 lg:border-r lg:last:border-r-0 ${
+                i > 0 ? "lg:pl-7" : ""
+              }`}
+            >
+              <div className="font-mono text-brand text-xs tracking-[0.25em]">{num}</div>
+              <h3 className="font-display uppercase text-2xl text-ink mt-5 tracking-tight leading-none">
+                {title}
+              </h3>
+              <p className="text-sm text-muted mt-3 leading-relaxed">{body}</p>
+            </div>
           ))}
         </div>
       </div>
