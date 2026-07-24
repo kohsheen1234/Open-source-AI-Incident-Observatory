@@ -1,0 +1,25 @@
+name: keepalive
+
+# Pings the live demo so Render's free-tier services don't sleep (they idle out
+# after ~15 min). Runs on a schedule; also runnable on demand from the Actions tab
+# via "Run workflow". Disable by deleting this file or turning the workflow off.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API and dashboard
+        run: |
+          echo "Pinging API..."
+          curl -sS --retry 3 --retry-all-errors -m 120 \
+            https://agentwatch-api-7mhz.onrender.com/health || true
+          echo
+          echo "Pinging dashboard..."
+          curl -sS --retry 3 --retry-all-errors -m 120 -o /dev/null \
+            https://agentwatch-dashboard-zner.onrender.com/ || true
+          echo "done"

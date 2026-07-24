@@ -322,7 +322,10 @@ Every push and pull request runs [GitHub Actions](.github/workflows/ci.yml): `ru
 linting and the full `pytest` suite — which **includes the classifier evaluation
 regression gate**, so a change that drops macro-F1 below the committed floor fails CI.
 A separate [docs workflow](.github/workflows/docs.yml) builds the MkDocs site with
-`--strict` and publishes it to GitHub Pages on every push to `main`.
+`--strict` and publishes it to GitHub Pages on every push to `main`. A
+[keep-alive workflow](.github/workflows/keepalive.yml) pings the live demo every
+~10 minutes so the free-tier services stay awake (and can be triggered manually from
+the Actions tab).
 
 ## Project layout
 
