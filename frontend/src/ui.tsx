@@ -19,7 +19,7 @@ export function StatCard({ label, value, hint }: { label: string; value: ReactNo
   return (
     <Card className="p-5">
       <div className="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-faint">{label}</div>
-      <div className="text-3xl font-bold text-ink mt-2 tabular-nums">{value}</div>
+      <div className="font-display text-4xl text-ink mt-2 tabular-nums">{value}</div>
       {hint && <div className="text-xs text-muted mt-1">{hint}</div>}
     </Card>
   );
@@ -96,8 +96,10 @@ export function Spinner({ label }: { label: string }) {
 export function SectionHeader({ eyebrow, title }: { eyebrow?: string; title: string }) {
   return (
     <div className="mb-4">
-      {eyebrow && <div className="eyebrow mb-1.5">{eyebrow}</div>}
-      <h2 className="text-2xl font-bold text-ink tracking-tight">{title}</h2>
+      {eyebrow && <div className="eyebrow mb-2">{eyebrow}</div>}
+      <h2 className="font-display uppercase text-3xl md:text-4xl text-ink tracking-tight leading-none">
+        {title}
+      </h2>
     </div>
   );
 }

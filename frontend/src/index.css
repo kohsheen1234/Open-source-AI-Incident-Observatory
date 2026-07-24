@@ -66,10 +66,10 @@ body {
 }
 
 .eyebrow {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: "Martian Mono", ui-monospace, monospace;
   color: #f5a524;
-  font-size: 0.72rem;
-  letter-spacing: 0.2em;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
 }
 

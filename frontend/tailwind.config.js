@@ -17,7 +17,9 @@ export default {
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["'JetBrains Mono'", "ui-monospace", "monospace"],
+        display: ["Anton", "Impact", "ui-sans-serif", "sans-serif"],
+        serif: ["'Libre Caslon Display'", "Georgia", "serif"],
+        mono: ["'Martian Mono'", "ui-monospace", "monospace"],
       },
       maxWidth: { content: "1180px" },
       boxShadow: {
