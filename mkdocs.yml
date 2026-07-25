@@ -27,6 +27,7 @@ markdown_extensions:
 nav:
   - Overview: index.md
   - Architecture: architecture.md
+  - System design: system-design.md
   - Collecting data: collection.md
   - Classification & evaluation: classification.md
   - API & dashboard: api.md

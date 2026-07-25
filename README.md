@@ -72,6 +72,17 @@ time.
 |---|---|
 | ![API docs](docs/assets/screenshots/04-api-docs.png) | ![Grafana](docs/assets/screenshots/05-grafana.png) |
 
+## Architecture
+
+![AgentWatch architecture](docs/assets/architecture.svg)
+
+Five stages — **collect → preserve → normalise → classify → serve** — with **evaluate**
+and **review** as quality loops around the classifier. PostgreSQL is the single source of
+truth; a FastAPI service is the only access layer; the React dashboard and any external
+consumer use that same API.
+
+📐 **[Read the full system design](https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/system-design/)** — every decision, why it was made, and its tradeoffs.
+
 ## Run the whole system
 
 With Docker installed:

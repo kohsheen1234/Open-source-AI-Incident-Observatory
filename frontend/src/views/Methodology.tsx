@@ -122,6 +122,19 @@ export function Methodology() {
         </div>
       </section>
 
+      {/* Architecture diagram */}
+      <section>
+        <SectionHeader eyebrow="Architecture" title="The whole system at a glance" />
+        <Card className="p-4 md:p-6">
+          <img
+            src="/architecture.svg"
+            alt="AgentWatch architecture: sources → ingestion → storage → classify & evaluate → access"
+            className="w-full h-auto"
+            loading="lazy"
+          />
+        </Card>
+      </section>
+
       {/* Pipeline stages */}
       <section>
         <SectionHeader eyebrow="The pipeline" title="From a public post to a reviewed incident" />

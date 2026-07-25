@@ -3,6 +3,11 @@
 This page describes the components that make up AgentWatch today, from configuration
 through to the deployed, observable stack.
 
+![AgentWatch architecture](assets/architecture.svg)
+
+For the *why* behind each decision — and the tradeoffs — see the
+[System design](system-design.md) write-up.
+
 ## The foundation layer
 
 ```text
