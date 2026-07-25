@@ -16,10 +16,10 @@ export default {
         faint: "#5b6666",
       },
       fontFamily: {
-        // Body/normal text is monospace (JetBrains Mono); display headings stay Inter.
-        sans: ["'JetBrains Mono'", "ui-monospace", "monospace"],
+        // Body/normal text is monospace (Fragment Mono); display headings stay Inter.
+        sans: ["'Fragment Mono'", "ui-monospace", "monospace"],
         display: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["'JetBrains Mono'", "ui-monospace", "monospace"],
+        mono: ["'Fragment Mono'", "ui-monospace", "monospace"],
       },
       maxWidth: { content: "1180px" },
       boxShadow: {

@@ -44,9 +44,10 @@
 .md-typeset td,
 .md-typeset th,
 .md-nav {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.76rem;
-  letter-spacing: -0.01em;
+  font-family: "Fragment Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  line-height: 1.45;
 }
 
 /* Thin, wide display headings — the app's editorial voice (sans, not mono). */

@@ -17,10 +17,11 @@ body {
   background-color: #0b0d0d;
   color: #e9eceb;
   /* Normal/body text is monospace; display headings opt back into Inter via .font-display. */
-  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  font-family: "Fragment Mono", ui-monospace, SFMono-Regular, monospace;
   font-weight: 400;
-  font-size: 0.95rem;
-  letter-spacing: -0.01em;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -69,8 +70,8 @@ body {
 }
 
 .eyebrow {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-weight: 500;
+  font-family: "Fragment Mono", ui-monospace, monospace;
+  font-weight: 400;
   color: #18b2ba;
   font-size: 0.66rem;
   letter-spacing: 0.22em;

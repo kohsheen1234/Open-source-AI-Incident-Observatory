@@ -9,7 +9,7 @@ theme:
     accent: custom
   font:
     text: Inter
-    code: JetBrains Mono
+    code: Fragment Mono
   features:
     - navigation.sections
     - navigation.top
