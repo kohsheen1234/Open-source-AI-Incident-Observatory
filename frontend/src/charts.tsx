@@ -30,6 +30,9 @@ const tooltipStyle = {
   color: "#e9eceb",
   fontSize: 12,
 };
+// Recharts styles the tooltip title and item rows separately from the box.
+const labelStyle = { color: "#e9eceb", fontWeight: 600 };
+const itemStyle = { color: "#aeb9b9" };
 
 export function TypeBar({ data }: { data: { type: string; count: number }[] }) {
   const sorted = [...data].sort((a, b) => a.count - b.count);
@@ -39,7 +42,7 @@ export function TypeBar({ data }: { data: { type: string; count: number }[] }) {
         <CartesianGrid horizontal={false} stroke={GRID} />
         <XAxis type="number" stroke={AXIS} tick={TICK} />
         <YAxis type="category" dataKey="type" width={150} stroke={AXIS} tick={TICK} />
-        <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+        <Tooltip contentStyle={tooltipStyle} labelStyle={labelStyle} itemStyle={itemStyle} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
         <Bar isAnimationActive={false} dataKey="count" radius={[0, 4, 4, 0]}>
           {sorted.map((d) => (
             <Cell key={d.type} fill={typeColor(d.type)} />
@@ -59,7 +62,7 @@ export function SourceDonut({ data }: { data: { source: string; count: number }[
             <Cell key={d.source} fill={SOURCE_COLORS[i % SOURCE_COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip contentStyle={tooltipStyle} />
+        <Tooltip contentStyle={tooltipStyle} labelStyle={labelStyle} itemStyle={itemStyle} />
       </PieChart>
     </ResponsiveContainer>
   );
@@ -78,7 +81,7 @@ export function TimeArea({ data }: { data: { date: string; count: number }[] }) 
         <CartesianGrid stroke={GRID} />
         <XAxis dataKey="date" stroke={AXIS} tick={TICK} />
         <YAxis stroke={AXIS} tick={TICK} allowDecimals={false} />
-        <Tooltip contentStyle={tooltipStyle} />
+        <Tooltip contentStyle={tooltipStyle} labelStyle={labelStyle} itemStyle={itemStyle} />
         <Area isAnimationActive={false} type="monotone" dataKey="count" stroke="#18b2ba" strokeWidth={2} fill="url(#g)" />
       </AreaChart>
     </ResponsiveContainer>
@@ -92,7 +95,7 @@ export function SeverityBar({ data }: { data: { severity: number; count: number 
         <CartesianGrid vertical={false} stroke={GRID} />
         <XAxis dataKey="severity" stroke={AXIS} tick={TICK} />
         <YAxis stroke={AXIS} tick={TICK} allowDecimals={false} />
-        <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+        <Tooltip contentStyle={tooltipStyle} labelStyle={labelStyle} itemStyle={itemStyle} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
         <Bar isAnimationActive={false} dataKey="count" radius={[4, 4, 0, 0]}>
           {data.map((d) => (
             <Cell key={d.severity} fill={sevColor(d.severity)} />
@@ -119,7 +122,7 @@ export function ConfidenceScatter({ items }: { items: IncidentSummary[] }) {
         <XAxis type="number" dataKey="confidence" name="confidence" domain={[0, 1]} stroke={AXIS} tick={TICK} />
         <YAxis type="number" dataKey="severity" name="severity" domain={[0, 5]} stroke={AXIS} tick={TICK} />
         <ZAxis range={[80, 80]} />
-        <Tooltip contentStyle={tooltipStyle} cursor={{ strokeDasharray: "3 3" }} />
+        <Tooltip contentStyle={tooltipStyle} labelStyle={labelStyle} itemStyle={itemStyle} cursor={{ strokeDasharray: "3 3" }} />
         <Scatter isAnimationActive={false} data={points}>
           {points.map((p, i) => (
             <Cell key={i} fill={typeColor(p.type)} />
