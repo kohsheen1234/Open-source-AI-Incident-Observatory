@@ -16,9 +16,10 @@ export default {
         faint: "#5b6666",
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        // Body/normal text is monospace (JetBrains Mono); display headings stay Inter.
+        sans: ["'JetBrains Mono'", "ui-monospace", "monospace"],
         display: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["'Martian Mono'", "ui-monospace", "monospace"],
+        mono: ["'JetBrains Mono'", "ui-monospace", "monospace"],
       },
       maxWidth: { content: "1180px" },
       boxShadow: {

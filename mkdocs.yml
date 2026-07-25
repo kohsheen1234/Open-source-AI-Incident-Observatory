@@ -9,7 +9,7 @@ theme:
     accent: custom
   font:
     text: Inter
-    code: Martian Mono
+    code: JetBrains Mono
   features:
     - navigation.sections
     - navigation.top

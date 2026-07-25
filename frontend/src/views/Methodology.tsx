@@ -100,7 +100,7 @@ export function Methodology() {
       {/* Why */}
       <section>
         <Eyebrow>Why this exists</Eyebrow>
-        <h1 className="font-extralight uppercase text-4xl md:text-6xl leading-[1.05] tracking-[0.01em] mt-3">
+        <h1 className="font-display font-extralight uppercase text-4xl md:text-6xl leading-[1.05] tracking-[0.01em] mt-3">
           <span className="grad-text">No black boxes.</span>
           <br />
           <span className="text-ink">Every step, explained.</span>

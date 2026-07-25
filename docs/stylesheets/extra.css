@@ -37,10 +37,28 @@
   border-bottom: 1px solid #242b2b;
 }
 
-/* Thin, wide display headings — the app's editorial voice. */
+/* Body/normal text is monospace (JetBrains Mono, loaded via theme font.code); headings stay Inter. */
+.md-typeset,
+.md-typeset p,
+.md-typeset li,
+.md-typeset td,
+.md-typeset th,
+.md-nav {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.76rem;
+  letter-spacing: -0.01em;
+}
+
+/* Thin, wide display headings — the app's editorial voice (sans, not mono). */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
 .md-typeset h1 {
   font-weight: 300;
-  letter-spacing: 0.01em;
   text-transform: uppercase;
   color: #ffffff;
 }
