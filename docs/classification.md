@@ -65,24 +65,17 @@ reproduced and that different models/prompts can be compared over time.
 
 ## Evaluation
 
-`agentwatch eval` runs the classifier over a labelled dataset
-(`agentwatch/eval/dataset.json`) and reports:
-
-- **precision, recall, F1** per incident type, and **macro-F1** overall
-- a **confusion matrix**
-- **abstention rate**
-- **total cost** and **average latency**
+`agentwatch eval` runs the classifier over a **frozen, labelled test set** and reports
+macro-F1 on both dimensions, per-class precision/recall, **selective accuracy at a given
+coverage**, **abstention precision/recall**, calibration, cost, latency, and the ten
+most-confident failure cases — compared across a ladder of baselines (majority → keyword
+→ local model).
 
 ```bash
-agentwatch eval --provider baseline
-agentwatch eval --provider ollama     # compare a real model on the same data
+agentwatch eval --provider majority   # constant-class floor
+agentwatch eval --provider baseline   # deterministic keyword classifier (default)
+agentwatch eval --provider ollama     # a real local model on the same data
 ```
 
-### The regression gate
-
-`tests/test_eval.py` runs the evaluation with the deterministic baseline and asserts
-macro-F1 stays above a committed floor. Because the baseline and dataset are fixed,
-this is a stable guard: a change to the prompt, taxonomy, or classifier logic that
-regresses quality on the labelled set **fails the test suite**. Real-model numbers
-(from Ollama or Anthropic) are produced with the same `agentwatch eval` command and
-can be recorded alongside a release.
+The full methodology, dataset design, results, and honest limitations live on their own
+page: **[Evaluation & methodology](evaluation.md)**.

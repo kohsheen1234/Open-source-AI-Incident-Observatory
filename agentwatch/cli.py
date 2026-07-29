@@ -39,18 +39,12 @@ def build_asgi_app():
 
 
 def run_eval_cmd(provider_key: str) -> int:
+    from agentwatch.eval.report import format_report
     from agentwatch.eval.runner import run_eval
     from agentwatch.sources import build_provider
 
     report = run_eval(build_provider(provider_key))
-    log.info(
-        "eval.report",
-        n=report.n,
-        macro_f1=round(report.metrics.macro_f1, 3),
-        abstention_rate=round(report.abstention_rate, 3),
-        total_cost_usd=round(report.total_cost_usd, 4),
-        avg_latency_ms=round(report.avg_latency_ms, 1),
-    )
+    print(format_report(provider_key, report))
     return 0
 
 
@@ -70,7 +64,7 @@ def main(argv: list[str] | None = None) -> int:
     cl.add_argument("--limit", type=int, default=None)
 
     ev = sub.add_parser("eval", help="Run the evaluation set and print metrics")
-    ev.add_argument("--provider", default="baseline", help="baseline | ollama")
+    ev.add_argument("--provider", default="baseline", help="majority | baseline | ollama")
 
     sv = sub.add_parser("serve", help="Run the HTTP API")
     sv.add_argument("--host", default="127.0.0.1")

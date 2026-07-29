@@ -153,7 +153,7 @@ complete and tested — provides:
 | **Reliable collection** | A CLI and optional scheduler run collection with retries, per-source failure isolation, and a recorded run history. |
 | **Pluggable classifier** | An `LLMProvider` interface with three backends: a deterministic Baseline (default, no dependencies), Ollama (local open-weight models), and optional Anthropic. Structured JSON output is validated; malformed output is retried, then abstained. |
 | **Abstain-capable taxonomy** | Ten incident types plus an explicit *insufficient_evidence* outcome, so the system distinguishes "no incident" from "not enough evidence". |
-| **Measured quality** | A labelled evaluation set with precision / recall / macro-F1 / confusion matrix / abstention rate, and a regression test that fails if macro-F1 drops below a committed floor. |
+| **Measured quality** | A frozen 131-example labelled set (full taxonomy + keyword-misleading hard negatives) scored across a majority → keyword → local-model baseline ladder: macro-F1 on both dimensions, per-class precision/recall, selective accuracy at coverage, abstention precision/recall, calibration, and failure cases — guarded by a regression test. |
 | **Documented HTTP API** | A FastAPI service (list / filter / detail / review / stats / CSV export) with auto-generated OpenAPI docs and optional API-key auth on writes. |
 | **Review dashboard** | A React single-page app (overview, incident explorer, review queue) that consumes the API — reviewers accept, override, or flag classifications. |
 | **Metrics & dashboards** | The API exposes Prometheus metrics; Prometheus scrapes them and a provisioned Grafana dashboard visualises incidents, classifications, abstention rate, and collection-run health. |
@@ -267,20 +267,38 @@ are reproducible and auditable.
 
 ## Measuring classifier quality
 
-Run the labelled evaluation set and print metrics:
+The classifier is scored against a **frozen, deliberately hard 131-example labelled set**
+(full taxonomy, 24 keyword-misleading hard negatives, 14 under-evidenced cases) across a
+ladder of baselines:
 
 ```bash
-agentwatch eval --provider baseline
-# → {"n": 24, "macro_f1": 1.0, "abstention_rate": 0.125, "total_cost_usd": 0.0, ...}
+agentwatch eval --provider majority    # constant-class floor
+agentwatch eval --provider baseline    # deterministic keyword classifier (default)
+agentwatch eval --provider ollama      # a real local model on identical data
 ```
 
-The same command works with `--provider ollama` to compare a real model against the
-baseline on identical data. A test (`tests/test_eval.py`) runs this evaluation and
-**fails if macro-F1 drops below a committed floor**, so a prompt or model change that
-regresses quality is caught automatically.
+Each run reports macro-F1 on both the **relevance** and **incident-type** dimensions,
+per-class precision/recall, **selective accuracy at a coverage level**, **abstention
+precision/recall**, calibration, cost, latency, and the ten most-confident failure cases.
+Measured on the frozen set:
 
-See [`docs/classification.md`](docs/classification.md) for the taxonomy, the providers,
-and the evaluation methodology.
+| System | Incident macro-F1 | Selective acc @ coverage | Abstention P / R | Cost | Latency |
+|---|---:|---:|---:|---:|---:|
+| Majority (floor) | 0.025 | 0.09 @ 1.00 | – | $0 | ~0 ms |
+| Keyword baseline | 0.273 | 0.37 @ 0.29 | 0.13 / 0.86 | $0 | ~0 ms |
+| Local `qwen2.5:7b` | **0.778** | **0.81 @ 0.66** | 0.29 / 0.93 | $0 | ~6 s |
+
+The local model nearly triples the baseline and is right **81%** of the time when it
+commits — but **both** score **0.00** on the keyword-misleading hard negatives (it can't
+yet tell "the agent did X" from "the human authorised X"), a concrete, evidence-backed
+pointer to where the next effort should go.
+
+A test (`tests/test_eval.py`) runs this evaluation and **fails if macro-F1 drops below a
+committed floor or the baseline stops beating the majority floor**, so a prompt or model
+change that regresses quality is caught in CI.
+
+See **[`docs/evaluation.md`](docs/evaluation.md)** for the dataset design, annotation
+methodology, full results, and honest limitations.
 
 ## The HTTP API
 

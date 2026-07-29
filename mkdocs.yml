@@ -30,7 +30,8 @@ nav:
   - System design: system-design.md
   - Benchmarks & failure modes: benchmarks.md
   - Collecting data: collection.md
-  - Classification & evaluation: classification.md
+  - Classification: classification.md
+  - Evaluation & methodology: evaluation.md
   - API & dashboard: api.md
   - Data model: data-model.md
   - Deployment & observability: deployment.md

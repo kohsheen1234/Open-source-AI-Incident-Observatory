@@ -31,6 +31,10 @@ def build_provider(key: str):
 
     if key == "baseline":
         return BaselineProvider()
+    if key == "majority":
+        from agentwatch.classify.providers.majority import MajorityProvider
+
+        return MajorityProvider()
     if key == "ollama":
         from agentwatch.classify.providers.ollama import OllamaProvider
 
