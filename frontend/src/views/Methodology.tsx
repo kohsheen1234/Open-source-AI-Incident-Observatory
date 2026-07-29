@@ -51,11 +51,13 @@ const STAGES: {
   {
     n: "05",
     name: "Evaluate",
-    input: "A hand-labelled dataset of example reports shipped in the repo.",
+    input:
+      "A frozen, deliberately hard 131-example labelled set: the full taxonomy, 24 keyword-misleading hard negatives, and 14 under-evidenced cases.",
     transform:
-      "The classifier runs over the labelled set; precision, recall, macro-F1, a confusion matrix, and the abstention rate are computed. A test asserts macro-F1 stays above a committed floor.",
-    output: "Quality metrics per provider, and a CI gate.",
-    why: "Without measurement, a prompt or model change could silently degrade quality. The gate makes regressions fail CI.",
+      "The classifier is scored across a baseline ladder (majority → keyword → local model) on both the relevance and incident-type dimensions: macro-F1, per-class precision/recall, selective accuracy at a coverage level, abstention precision/recall, calibration, cost, latency, and the ten most-confident failure cases. A test asserts macro-F1 stays above a committed floor and beats the majority floor.",
+    output:
+      "Comparable per-provider metrics and a CI gate. Measured: majority 0.025, keyword baseline 0.273, local qwen2.5:7b 0.778 incident macro-F1 — the 7B is right 81% of the time when it commits, yet still scores 0.00 on the hard negatives.",
+    why: "Without measurement a prompt or model change could silently degrade quality — and a flattering test set hides exactly the failures that matter. The gate makes regressions fail CI.",
   },
   {
     n: "06",
@@ -265,9 +267,20 @@ export function Methodology() {
           </p>
           <p>
             <span className="text-ink">The default classifier is a keyword baseline</span>, chosen so
-            the whole system runs with no model server or API key. It is transparent but simplistic;
-            a local (Ollama) or hosted (Anthropic) model can be swapped in and measured with the same
-            evaluation.
+            the whole system runs with no model server or API key. It is transparent but simplistic
+            (0.273 incident macro-F1); a local (Ollama) or hosted (Anthropic) model can be swapped in
+            and measured with the same evaluation — the local 7B reaches 0.778.
+          </p>
+          <p>
+            <span className="text-ink">The labelled set has one annotator.</span> There is no
+            inter-annotator agreement yet, so the ground truth carries one person’s judgement calls,
+            and it is reconstructed to be hard and balanced rather than sampled from the live source
+            distribution. A second annotator and a reported κ is the top open item.
+          </p>
+          <p>
+            <span className="text-ink">Hard negatives are unsolved.</span> Both the baseline and the
+            7B model fail to tell “the agent did X” from “the human authorised X and it complied” —
+            a measured capability gap, documented rather than hidden.
           </p>
           <p>
             <span className="text-ink">Coverage is a sample, not a census.</span> It reflects the
