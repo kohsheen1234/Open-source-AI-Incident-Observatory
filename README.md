@@ -19,7 +19,7 @@
 
 ![AgentWatch demo](docs/assets/demo.gif)
 
-*The dashboard, API docs, and Grafana metrics — running the full stack against 84 real incidents (replay + live Hacker News).*
+*The dashboard, API docs, and Grafana metrics — running the full stack against live Hacker News incidents, classified by a local open-weight model.*
 
 As AI systems increasingly act on their own — running tools, taking actions, and
 operating with growing autonomy — people are posting about what happens when those
@@ -282,16 +282,18 @@ per-class precision/recall, **selective accuracy at a coverage level**, **absten
 precision/recall**, calibration, cost, latency, and the ten most-confident failure cases.
 Measured on the frozen set:
 
-| System | Incident macro-F1 | Selective acc @ coverage | Abstention P / R | Cost | Latency |
+| System | Incident macro-F1 | Relevance macro-F1 | Selective acc @ coverage | Cost | Latency |
 |---|---:|---:|---:|---:|---:|
-| Majority (floor) | 0.025 | 0.09 @ 1.00 | – | $0 | ~0 ms |
-| Keyword baseline | 0.273 | 0.37 @ 0.29 | 0.13 / 0.86 | $0 | ~0 ms |
-| Local `qwen2.5:7b` | **0.778** | **0.81 @ 0.66** | 0.29 / 0.93 | $0 | ~6 s |
+| Majority (floor) | 0.025 | 0.277 | 0.09 @ 1.00 | $0 | ~0 ms |
+| Keyword baseline | 0.273 | 0.189 | 0.37 @ 0.29 | $0 | ~0 ms |
+| Local `qwen2.5:7b` | **0.749** | **0.747** | **0.72 @ 0.94** | $0 | ~4 s |
 
-The local model nearly triples the baseline and is right **81%** of the time when it
-commits — but **both** score **0.00** on the keyword-misleading hard negatives (it can't
-yet tell "the agent did X" from "the human authorised X"), a concrete, evidence-backed
-pointer to where the next effort should go.
+The local model nearly triples the baseline's discriminative score and handles the
+keyword-misleading hard negatives the baseline can't (`not_relevant` F1 **0.00 → 0.69**).
+The evaluation also *caught a real bug*: an earlier 0.00 on `not_relevant` turned out to be
+a schema that discarded the model's correct "not an incident" verdicts — the kind of thing
+only per-class metrics expose. Full analysis and honest limitations in
+[`docs/evaluation.md`](docs/evaluation.md).
 
 A test (`tests/test_eval.py`) runs this evaluation and **fails if macro-F1 drops below a
 committed floor or the baseline stops beating the majority floor**, so a prompt or model

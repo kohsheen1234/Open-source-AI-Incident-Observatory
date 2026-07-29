@@ -56,7 +56,7 @@ const STAGES: {
     transform:
       "The classifier is scored across a baseline ladder (majority → keyword → local model) on both the relevance and incident-type dimensions: macro-F1, per-class precision/recall, selective accuracy at a coverage level, abstention precision/recall, calibration, cost, latency, and the ten most-confident failure cases. A test asserts macro-F1 stays above a committed floor and beats the majority floor.",
     output:
-      "Comparable per-provider metrics and a CI gate. Measured: majority 0.025, keyword baseline 0.273, local qwen2.5:7b 0.778 incident macro-F1 — the 7B is right 81% of the time when it commits, yet still scores 0.00 on the hard negatives.",
+      "Comparable per-provider metrics and a CI gate. Measured incident macro-F1: majority 0.025, keyword baseline 0.273, local qwen2.5:7b 0.749 — and the 7B handles the keyword-misleading hard negatives the baseline can't (not_relevant F1 0.00 → 0.69). The eval even caught a schema bug that was discarding correct 'not an incident' verdicts.",
     why: "Without measurement a prompt or model change could silently degrade quality — and a flattering test set hides exactly the failures that matter. The gate makes regressions fail CI.",
   },
   {
@@ -269,7 +269,8 @@ export function Methodology() {
             <span className="text-ink">The default classifier is a keyword baseline</span>, chosen so
             the whole system runs with no model server or API key. It is transparent but simplistic
             (0.273 incident macro-F1); a local (Ollama) or hosted (Anthropic) model can be swapped in
-            and measured with the same evaluation — the local 7B reaches 0.778.
+            and measured with the same evaluation — the local 7B reaches 0.749, and the live feed on
+            this site is labelled by it.
           </p>
           <p>
             <span className="text-ink">The labelled set has one annotator.</span> There is no
@@ -278,9 +279,10 @@ export function Methodology() {
             distribution. A second annotator and a reported κ is the top open item.
           </p>
           <p>
-            <span className="text-ink">Hard negatives are unsolved.</span> Both the baseline and the
-            7B model fail to tell “the agent did X” from “the human authorised X and it complied” —
-            a measured capability gap, documented rather than hidden.
+            <span className="text-ink">The model still misses understated incidents.</span> The 7B
+            now handles hard negatives well (not_relevant F1 0.69), but its remaining errors run the
+            other way — it sometimes dismisses a real but subtly-worded incident as “not relevant.”
+            A measured gap, documented rather than hidden.
           </p>
           <p>
             <span className="text-ink">Coverage is a sample, not a census.</span> It reflects the
