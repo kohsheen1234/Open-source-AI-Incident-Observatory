@@ -27,6 +27,7 @@ class ReviewOut(BaseModel):
 class IncidentSummary(BaseModel):
     id: int
     source: str
+    source_id: str | None = None
     url: str
     title: str
     published_at: datetime | None

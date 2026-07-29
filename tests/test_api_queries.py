@@ -56,8 +56,9 @@ def test_list_and_filter_incidents():
     with Session(engine) as s:
         rows, total = queries.list_incidents(s)
         assert total == 1
-        _, cls = rows[0]
+        _, cls, source_id = rows[0]
         assert cls.incident_type == "destructive_action"
+        assert source_id == "1"
 
         _, total_filtered = queries.list_incidents(s, incident_type="deception")
         assert total_filtered == 0
@@ -70,7 +71,8 @@ def test_add_review_and_detail():
         review = queries.add_review(s, inc_id, reviewer="me", decision="accept", notes="ok")
         s.commit()
         assert review.decision == "accept"
-        inc, classes, reviews = queries.get_incident(s, inc_id)
+        inc, source_id, classes, reviews = queries.get_incident(s, inc_id)
+        assert source_id == "1"
         assert len(classes) == 1 and len(reviews) == 1
 
 

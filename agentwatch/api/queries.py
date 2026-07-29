@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from agentwatch.db.models import Classification, Incident, Review
+from agentwatch.db.models import Classification, Incident, RawArtifact, Review
 
 
 def _latest_class_subq():
@@ -22,7 +22,8 @@ def _latest_class_subq():
 def _filtered_select(source, incident_type, abstained, min_severity, relevance):
     sub = _latest_class_subq()
     stmt = (
-        select(Incident, Classification)
+        select(Incident, Classification, RawArtifact.source_id)
+        .join(RawArtifact, RawArtifact.id == Incident.raw_artifact_id)
         .outerjoin(sub, sub.c.incident_id == Incident.id)
         .outerjoin(Classification, Classification.id == sub.c.cid)
     )
@@ -56,7 +57,7 @@ def list_incidents(
     stmt = _filtered_select(source, incident_type, abstained, min_severity, relevance)
     total = session.scalar(select(func.count()).select_from(stmt.subquery()))
     page = stmt.order_by(Incident.id.desc()).limit(limit).offset(offset)
-    rows = [(inc, cls) for inc, cls in session.execute(page).all()]
+    rows = [(inc, cls, sid) for inc, cls, sid in session.execute(page).all()]
     return rows, int(total or 0)
 
 
@@ -64,6 +65,9 @@ def get_incident(session: Session, incident_id: int):
     inc = session.get(Incident, incident_id)
     if inc is None:
         return None
+    source_id = session.scalar(
+        select(RawArtifact.source_id).where(RawArtifact.id == inc.raw_artifact_id)
+    )
     classes = session.scalars(
         select(Classification).where(Classification.incident_id == incident_id)
     ).all()
@@ -73,7 +77,7 @@ def get_incident(session: Session, incident_id: int):
         if class_ids
         else []
     )
-    return inc, list(classes), list(reviews)
+    return inc, source_id, list(classes), list(reviews)
 
 
 def add_review(session: Session, incident_id: int, *, reviewer: str, decision: str, notes):
@@ -133,7 +137,7 @@ def incidents_csv(session: Session) -> str:
     writer.writerow(
         ["id", "source", "url", "title", "published_at", "incident_type", "severity", "confidence"]
     )
-    for inc, cls in rows:
+    for inc, cls, _sid in rows:
         writer.writerow(
             [
                 inc.id,

@@ -12,6 +12,7 @@ export interface Classification {
 export interface IncidentSummary {
   id: number;
   source: string;
+  source_id: string | null;
   url: string;
   title: string;
   published_at: string | null;

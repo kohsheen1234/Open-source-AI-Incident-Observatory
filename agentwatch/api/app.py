@@ -30,10 +30,11 @@ def _classification_out(cls) -> ClassificationOut | None:
     )
 
 
-def _summary(inc, cls) -> IncidentSummary:
+def _summary(inc, cls, source_id=None) -> IncidentSummary:
     return IncidentSummary(
         id=inc.id,
         source=inc.source,
+        source_id=source_id,
         url=inc.url,
         title=inc.title,
         published_at=inc.published_at,
@@ -95,7 +96,7 @@ def create_app() -> FastAPI:
                 limit=limit,
                 offset=offset,
             )
-            items = [_summary(inc, cls) for inc, cls in rows]
+            items = [_summary(inc, cls, sid) for inc, cls, sid in rows]
         return Page(items=items, total=total, limit=limit, offset=offset)
 
     @app.get("/incidents/{incident_id}", response_model=IncidentDetail)
@@ -104,10 +105,10 @@ def create_app() -> FastAPI:
             found = queries.get_incident(s, incident_id)
             if found is None:
                 raise HTTPException(status_code=404, detail="incident not found")
-            inc, classes, reviews = found
+            inc, source_id, classes, reviews = found
             latest = classes[-1] if classes else None
             return IncidentDetail(
-                **_summary(inc, latest).model_dump(),
+                **_summary(inc, latest, source_id).model_dump(),
                 body=inc.body,
                 classifications=[_classification_out(c) for c in classes],
                 reviews=[_review_out(r) for r in reviews],

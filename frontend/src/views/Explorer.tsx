@@ -12,6 +12,16 @@ function classLabel(c: Classification | null | undefined): string | null {
   return c.relevance; // "not_relevant" | "insufficient_evidence"
 }
 
+// The report's own page (the HN thread) vs. the link it points to. For a Show HN the
+// stored url is the submitted link (e.g. a GitHub repo); the discussion lives at the HN
+// item. Prefer the discussion as "the post"; expose the submitted link separately.
+function discussionUrl(it: { source: string; source_id: string | null }): string | null {
+  if (it.source === "hackernews" && it.source_id) {
+    return `https://news.ycombinator.com/item?id=${it.source_id}`;
+  }
+  return null;
+}
+
 export function Explorer() {
   const [page, setPage] = useState<Page | null>(null);
   const [type, setType] = useState<string>("");
@@ -157,7 +167,7 @@ export function Explorer() {
                       <td className="px-4 py-3 text-ink max-w-md truncate">{it.title}</td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <a
-                          href={it.url}
+                          href={discussionUrl(it) ?? it.url}
                           target="_blank"
                           rel="noreferrer"
                           onClick={(e) => e.stopPropagation()}
@@ -215,11 +225,26 @@ function ExpandedDetail({ detail, onClose }: { detail: IncidentDetail; onClose: 
       <p className="text-sm text-muted leading-relaxed whitespace-pre-wrap mt-3">
         {cleanText(detail.body)}
       </p>
-      <a className="text-sm inline-block mt-3" href={detail.url} target="_blank" rel="noreferrer">
-        View original post ↗
-      </a>
+      <div className="flex flex-wrap gap-x-5 gap-y-1 mt-3 text-sm">
+        <a href={discussionUrl(detail) ?? detail.url} target="_blank" rel="noreferrer">
+          View original post ↗
+        </a>
+        {discussionUrl(detail) && detail.url && detail.url !== discussionUrl(detail) && (
+          <a className="text-muted" href={detail.url} target="_blank" rel="noreferrer">
+            Linked resource: {shortHost(detail.url)} ↗
+          </a>
+        )}
+      </div>
     </div>
   );
+}
+
+function shortHost(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "link";
+  }
 }
 
 function ConfidenceBar({ value }: { value: number }) {
