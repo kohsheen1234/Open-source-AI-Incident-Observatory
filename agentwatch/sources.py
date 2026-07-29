@@ -3,11 +3,18 @@ from agentwatch.collectors.hackernews import HackerNewsSource
 from agentwatch.collectors.reddit import reddit_enabled
 from agentwatch.collectors.replay import ReplaySource
 
+# Incident-oriented searches. Generic terms ("autonomous agent") pull in mostly product
+# launches and discussion; these target reports of an agent actually misbehaving, so a much
+# larger share of what we collect is a real incident rather than noise.
 QUERIES = [
-    "AI agent deleted",
-    "autonomous agent",
-    "agent ignored instructions",
-    "AI agent unexpected",
+    "AI agent deleted my files",
+    "coding agent deleted my",
+    "agent ignored my instructions",
+    "AI agent went rogue",
+    "agent ran rm -rf",
+    "agent acted without permission",
+    "agent leaked my",
+    "agent wiped",
 ]
 
 

@@ -56,5 +56,7 @@ class Page(BaseModel):
 class Stats(BaseModel):
     total_incidents: int
     total_classified: int
+    confirmed_incidents: int = 0
     abstention_rate: float
     by_incident_type: dict[str, int]
+    by_relevance: dict[str, int] = {}

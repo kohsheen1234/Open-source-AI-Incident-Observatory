@@ -1,20 +1,36 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import { INCIDENT_TYPES, cleanText } from "../theme";
-import type { IncidentDetail, Page } from "../types";
+import type { Classification, IncidentDetail, Page } from "../types";
 import { Card, SectionHeader, SeverityChip, TypeBadge } from "../ui";
+
+// What to show in the TYPE column. For a real incident, the incident type; otherwise the
+// relevance verdict, so a confident "not an incident" never masquerades as an abstention.
+function classLabel(c: Classification | null | undefined): string | null {
+  if (!c) return null;
+  if (c.relevance === "relevant") return c.incident_type;
+  return c.relevance; // "not_relevant" | "insufficient_evidence"
+}
 
 export function Explorer() {
   const [page, setPage] = useState<Page | null>(null);
   const [type, setType] = useState<string>("");
+  const [view, setView] = useState<"relevant" | "all">("relevant");
   const [minConf, setMinConf] = useState<number>(0);
   const [search, setSearch] = useState<string>("");
   const [selected, setSelected] = useState<number | null>(null);
   const [detail, setDetail] = useState<IncidentDetail | null>(null);
 
   useEffect(() => {
-    api.incidents({ limit: 500, incident_type: type || undefined }).then(setPage).catch(() => {});
-  }, [type]);
+    api
+      .incidents({
+        limit: 500,
+        incident_type: type || undefined,
+        relevance: view === "relevant" ? "relevant" : undefined,
+      })
+      .then(setPage)
+      .catch(() => {});
+  }, [type, view]);
 
   useEffect(() => {
     if (selected != null) api.incident(selected).then(setDetail).catch(() => setDetail(null));
@@ -34,11 +50,32 @@ export function Explorer() {
     <div>
       <SectionHeader eyebrow="Browse" title="Incident Explorer" />
       <p className="text-muted mb-5 -mt-2">
-        Browse and filter every collected incident. <span className="text-ink">Each row is a real
-        public post.</span>
+        {view === "relevant" ? (
+          <>
+            Confirmed AI-agent incidents — the classifier judged each one <span className="text-ink">a
+            real incident</span>. Switch to “All collected posts” to see everything, including
+            non-incidents.
+          </>
+        ) : (
+          <>
+            Every collected post, including ones the classifier ruled <span className="text-ink">not an
+            incident</span>. Each row is a real public post.
+          </>
+        )}
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5">
+        <label className="text-sm text-muted">
+          Show
+          <select
+            value={view}
+            onChange={(e) => setView(e.target.value as "relevant" | "all")}
+            className="mt-1 w-full bg-panel border border-border rounded-md px-3 py-2 text-ink"
+          >
+            <option value="relevant">Confirmed incidents</option>
+            <option value="all">All collected posts</option>
+          </select>
+        </label>
         <label className="text-sm text-muted">
           Incident type
           <select
@@ -78,7 +115,8 @@ export function Explorer() {
       </div>
 
       <p className="text-xs text-muted mb-2">
-        Showing {rows.length} of {page?.total ?? 0} incidents.
+        Showing {rows.length} {view === "relevant" ? "confirmed incidents" : "collected posts"}
+        {page?.total != null ? ` of ${page.total}` : ""}.
       </p>
 
       <Card className="overflow-hidden">
@@ -104,7 +142,7 @@ export function Explorer() {
                     onClick={() => setSelected(it.id)}
                   >
                     <td className="px-4 py-3">
-                      <TypeBadge type={c?.incident_type ?? null} />
+                      <TypeBadge type={classLabel(c)} />
                     </td>
                     <td className="px-4 py-3">
                       <SeverityChip severity={c?.severity ?? null} />
@@ -136,7 +174,7 @@ export function Explorer() {
             </button>
           </div>
           <div className="flex flex-wrap gap-2 my-3">
-            <TypeBadge type={detail.classification?.incident_type ?? null} />
+            <TypeBadge type={classLabel(detail.classification)} />
             <SeverityChip severity={detail.classification?.severity ?? null} />
           </div>
           {detail.classification?.reasoning_summary && (

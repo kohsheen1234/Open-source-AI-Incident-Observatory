@@ -29,7 +29,8 @@ export function Overview({
 
   useEffect(() => {
     api.stats().then(setStats).catch(() => {});
-    api.incidents({ limit: 500 }).then(setPage).catch(() => {});
+    // Charts describe *real* incidents; non-incidents would swamp the type breakdown.
+    api.incidents({ limit: 500, relevance: "relevant" }).then(setPage).catch(() => {});
   }, []);
 
   const agg = useMemo(() => {
@@ -91,8 +92,12 @@ export function Overview({
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-10">
-        <StatCard label="Incidents" value={stats?.total_incidents ?? "…"} hint="collected" />
-        <StatCard label="Classified" value={stats?.total_classified ?? "…"} hint="labelled" />
+        <StatCard
+          label="Confirmed incidents"
+          value={stats?.confirmed_incidents ?? "…"}
+          hint="judged real"
+        />
+        <StatCard label="Posts scanned" value={stats?.total_incidents ?? "…"} hint="collected" />
         <StatCard
           label="Abstention"
           value={stats ? `${Math.round(stats.abstention_rate * 100)}%` : "…"}
@@ -133,7 +138,7 @@ export function Overview({
         <SectionHeader eyebrow="Breakdown" title="What kinds of incidents, and from where" />
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <Card className="lg:col-span-3 p-5">
-            <h3 className="font-semibold text-ink mb-3">Incidents by type</h3>
+            <h3 className="font-semibold text-ink mb-3">Confirmed incidents by type</h3>
             {agg.type.length ? <TypeBar data={agg.type} /> : <Empty />}
           </Card>
           <Card className="lg:col-span-2 p-5">
@@ -175,8 +180,9 @@ export function Overview({
       </details>
 
       <p className="text-xs text-faint mt-6">
-        Data collected from Hacker News (live) + a bundled sample set, classified by the baseline
-        classifier. Classifications are automated and unverified until reviewed.
+        Posts collected live from Hacker News and classified by a local open-weight model
+        (qwen2.5:7b-instruct). Charts count only posts judged real incidents. Classifications are
+        automated and unverified until a human reviews them.
       </p>
     </div>
   );

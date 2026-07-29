@@ -44,6 +44,8 @@ export interface Page {
 export interface Stats {
   total_incidents: number;
   total_classified: number;
+  confirmed_incidents: number;
   abstention_rate: number;
   by_incident_type: Record<string, number>;
+  by_relevance: Record<string, number>;
 }

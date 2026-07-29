@@ -19,7 +19,7 @@ def _latest_class_subq():
     )
 
 
-def _filtered_select(source, incident_type, abstained, min_severity):
+def _filtered_select(source, incident_type, abstained, min_severity, relevance):
     sub = _latest_class_subq()
     stmt = (
         select(Incident, Classification)
@@ -31,6 +31,8 @@ def _filtered_select(source, incident_type, abstained, min_severity):
         conds.append(Incident.source == source)
     if incident_type is not None:
         conds.append(Classification.incident_type == incident_type)
+    if relevance is not None:
+        conds.append(Classification.relevance == relevance)
     if abstained is not None:
         conds.append(Classification.abstained == abstained)
     if min_severity is not None:
@@ -47,10 +49,11 @@ def list_incidents(
     incident_type=None,
     abstained=None,
     min_severity=None,
+    relevance=None,
     limit=50,
     offset=0,
 ):
-    stmt = _filtered_select(source, incident_type, abstained, min_severity)
+    stmt = _filtered_select(source, incident_type, abstained, min_severity, relevance)
     total = session.scalar(select(func.count()).select_from(stmt.subquery()))
     page = stmt.order_by(Incident.id.desc()).limit(limit).offset(offset)
     rows = [(inc, cls) for inc, cls in session.execute(page).all()]
@@ -96,18 +99,30 @@ def add_review(session: Session, incident_id: int, *, reviewer: str, decision: s
 
 def stats(session: Session) -> dict:
     total_incidents = session.scalar(select(func.count()).select_from(Incident)) or 0
-    rows = session.execute(select(Classification.incident_type, Classification.abstained)).all()
+    # Latest classification per incident, so counts reflect the current label (not history).
+    sub = _latest_class_subq()
+    rows = session.execute(
+        select(Classification.incident_type, Classification.abstained, Classification.relevance)
+        .join(sub, Classification.id == sub.c.cid)
+    ).all()
     by_type: dict[str, int] = {}
-    abstained = 0
-    for incident_type, is_abstained in rows:
-        by_type[incident_type] = by_type.get(incident_type, 0) + 1
+    by_relevance: dict[str, int] = {}
+    abstained = confirmed = 0
+    for incident_type, is_abstained, relevance in rows:
         abstained += 1 if is_abstained else 0
+        by_relevance[relevance] = by_relevance.get(relevance, 0) + 1
+        if relevance == "relevant":
+            confirmed += 1
+            # Only break down real incidents by type; non-incidents would swamp it.
+            by_type[incident_type] = by_type.get(incident_type, 0) + 1
     total_classified = len(rows)
     return {
         "total_incidents": int(total_incidents),
         "total_classified": total_classified,
+        "confirmed_incidents": confirmed,
         "abstention_rate": (abstained / total_classified) if total_classified else 0.0,
         "by_incident_type": by_type,
+        "by_relevance": by_relevance,
     }
 
 

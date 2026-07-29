@@ -78,6 +78,7 @@ def create_app() -> FastAPI:
     def list_incidents(
         source: str | None = None,
         incident_type: str | None = None,
+        relevance: str | None = None,
         abstained: bool | None = None,
         min_severity: int | None = None,
         limit: int = Query(50, ge=1, le=500),
@@ -88,6 +89,7 @@ def create_app() -> FastAPI:
                 s,
                 source=source,
                 incident_type=incident_type,
+                relevance=relevance,
                 abstained=abstained,
                 min_severity=min_severity,
                 limit=limit,
