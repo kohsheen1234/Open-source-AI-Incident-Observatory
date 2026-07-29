@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import { INCIDENT_TYPES, cleanText } from "../theme";
 import type { Classification, IncidentDetail, Page } from "../types";
@@ -135,29 +135,50 @@ export function Explorer() {
             <tbody>
               {rows.map((it) => {
                 const c = it.classification;
+                const open = selected === it.id;
                 return (
-                  <tr
-                    key={it.id}
-                    className="border-b border-border/60 hover:bg-panel/60 cursor-pointer"
-                    onClick={() => setSelected(it.id)}
-                  >
-                    <td className="px-4 py-3">
-                      <TypeBadge type={classLabel(c)} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <SeverityChip severity={c?.severity ?? null} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <ConfidenceBar value={c?.confidence ?? 0} />
-                    </td>
-                    <td className="px-4 py-3 text-muted">{it.source}</td>
-                    <td className="px-4 py-3 text-ink max-w-md truncate">{it.title}</td>
-                    <td className="px-4 py-3">
-                      <a href={it.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
-                        open ↗
-                      </a>
-                    </td>
-                  </tr>
+                  <Fragment key={it.id}>
+                    <tr
+                      className={`border-b border-border/60 hover:bg-panel/60 cursor-pointer ${
+                        open ? "bg-panel/70" : ""
+                      }`}
+                      onClick={() => setSelected(open ? null : it.id)}
+                    >
+                      <td className="px-4 py-3">
+                        <TypeBadge type={classLabel(c)} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <SeverityChip severity={c?.severity ?? null} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <ConfidenceBar value={c?.confidence ?? 0} />
+                      </td>
+                      <td className="px-4 py-3 text-muted">{it.source}</td>
+                      <td className="px-4 py-3 text-ink max-w-md truncate">{it.title}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <a
+                          href={it.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          open ↗
+                        </a>
+                        <span className="ml-3 text-muted select-none">{open ? "▲" : "▼"}</span>
+                      </td>
+                    </tr>
+                    {open && (
+                      <tr className="border-b border-border/60 bg-panel/30">
+                        <td colSpan={6} className="px-4 pb-5 pt-1">
+                          {detail && detail.id === it.id ? (
+                            <ExpandedDetail detail={detail} onClose={() => setSelected(null)} />
+                          ) : (
+                            <div className="text-muted text-sm py-3">Loading…</div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 );
               })}
             </tbody>
@@ -165,29 +186,38 @@ export function Explorer() {
         </div>
       </Card>
 
-      {detail && selected != null && (
-        <Card className="p-5 mt-6">
-          <div className="flex items-start justify-between gap-4">
-            <h3 className="text-lg font-semibold text-ink">{detail.title}</h3>
-            <button className="text-muted hover:text-ink" onClick={() => setSelected(null)}>
-              ✕
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2 my-3">
-            <TypeBadge type={classLabel(detail.classification)} />
-            <SeverityChip severity={detail.classification?.severity ?? null} />
-          </div>
-          {detail.classification?.reasoning_summary && (
-            <div className="text-sm text-brand bg-brand/10 border border-brand/30 rounded-lg px-3 py-2 mb-3">
-              Classifier reasoning: {detail.classification.reasoning_summary}
-            </div>
-          )}
-          <p className="text-sm text-muted leading-relaxed">{cleanText(detail.body)}</p>
-          <a className="text-sm inline-block mt-3" href={detail.url} target="_blank" rel="noreferrer">
-            View original post ↗
-          </a>
-        </Card>
+    </div>
+  );
+}
+
+function ExpandedDetail({ detail, onClose }: { detail: IncidentDetail; onClose: () => void }) {
+  const c = detail.classification;
+  return (
+    <div>
+      <div className="flex items-start justify-between gap-4">
+        <h3 className="text-base font-semibold text-ink">{detail.title}</h3>
+        <button
+          className="shrink-0 text-xs text-muted hover:text-ink border border-border rounded-md px-2 py-1"
+          onClick={onClose}
+        >
+          Minimise ▲
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-2 mt-3">
+        <TypeBadge type={classLabel(c)} />
+        <SeverityChip severity={c?.severity ?? null} />
+      </div>
+      {c?.reasoning_summary && (
+        <div className="text-sm text-brand bg-brand/10 border border-brand/30 rounded-lg px-3 py-2 my-3">
+          Classifier reasoning: {c.reasoning_summary}
+        </div>
       )}
+      <p className="text-sm text-muted leading-relaxed whitespace-pre-wrap mt-3">
+        {cleanText(detail.body)}
+      </p>
+      <a className="text-sm inline-block mt-3" href={detail.url} target="_blank" rel="noreferrer">
+        View original post ↗
+      </a>
     </div>
   );
 }
