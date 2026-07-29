@@ -83,6 +83,34 @@ consumer use that same API.
 
 📐 **[Read the full system design](https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/system-design/)** — every decision, why it was made, and its tradeoffs.
 
+## Scale: designed for it, validated locally
+
+This is a **portfolio system** — the aim is to show it's *designed and validated* for
+scale, not to pay to *operate* at scale. A repeatable local load test
+(`agentwatch bench --count 100000`) runs 100k synthetic incidents through the real
+pipeline on SQLite and reports:
+
+- **ingestion ~4,100 records/sec**, with **30% duplicates correctly suppressed**
+- **classification ~8,600 incidents/sec** (baseline provider)
+- **`GET /incidents` p50 ≈ 188 ms** at 70k rows — the identified bottleneck (a per-request
+  `COUNT` over a latest-classification join; the fix is keyset pagination + a materialised
+  latest-classification column + Postgres indexes)
+
+Deliberate-failure tests (`tests/test_failure_modes.py`) cover collector timeouts (isolated),
+mid-batch storage failure (**atomic rollback**), duplicate ingestion (idempotent), malformed
+input (abstain), and bad model output (abstain). Full write-up:
+**[Benchmarks & failure modes](https://kohsheen1234.github.io/Open-source-AI-Incident-Observatory/benchmarks/)**.
+
+| Demonstrated (built & tested) | Designed for, not yet required |
+|---|---|
+| Single-node ingestion (~4.1k rec/s) | Horizontal ingestion workers |
+| Content-hash deduplication | Distributed deduplication |
+| Pluggable storage (`StorageBackend` → `LocalArtifactStore`) | `S3ArtifactStore` (interface in place) |
+| Pluggable sources (`DataSource`) + scheduled/CLI collection | Durable job queue |
+| Pluggable classifier (baseline / Ollama / Anthropic) | Larger hosted models at volume |
+| Prometheus metrics + Grafana | Multi-region monitoring |
+| Portable Postgres / SQLite | Read replicas / sharding |
+
 ## Run the whole system
 
 With Docker installed:

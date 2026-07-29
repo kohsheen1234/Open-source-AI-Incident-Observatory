@@ -76,6 +76,11 @@ def main(argv: list[str] | None = None) -> int:
     sv.add_argument("--host", default="127.0.0.1")
     sv.add_argument("--port", type=int, default=8000)
 
+    bn = sub.add_parser("bench", help="Local load test on a throwaway SQLite database")
+    bn.add_argument("--count", type=int, default=100_000)
+    bn.add_argument("--duplicate-fraction", type=float, default=0.3)
+    bn.add_argument("--chunk", type=int, default=1000)
+
     args = parser.parse_args(argv)
     since = datetime.now(UTC) - timedelta(hours=getattr(args, "since_hours", 168))
 
@@ -94,6 +99,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "eval":
         return run_eval_cmd(args.provider)
+    if args.command == "bench":
+        from agentwatch.bench import format_report, run_benchmark
+
+        result = run_benchmark(args.count, args.duplicate_fraction, args.chunk)
+        print(format_report(result))
+        return 0
     if args.command == "serve":
         import uvicorn
 
